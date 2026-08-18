@@ -9,8 +9,8 @@
 - (void)testColumnsPreserveSpreadsheetContract {
     NSString *columns = [[PayloadBuilder columnNames] componentsJoinedByString:@","];
     XCTAssertEqualObjects(columns,
-        @"scout,match,team,alliance,station,robotNotes,autoMobility,autoFuel,autoAmp,"
-         "teleopSpeaker,teleopAmp,teleopFeed,fouls,defenseRating,endgame,comments");
+        @"scout,match,team,alliance,station,robotNotes,autoFuelScored,autoFuelMissed,autoTowerLevel1,"
+         "teleopFuelScored,teleopFuelMissed,teleopFuelInactive,fouls,defenseRating,towerLevel,comments");
 }
 
 - (void)testSanitizerMatchesLegacyCSVBehavior {

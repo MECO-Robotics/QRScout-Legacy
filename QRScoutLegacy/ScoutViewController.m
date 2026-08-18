@@ -20,12 +20,12 @@
 @property (strong, nonatomic) UISegmentedControl *stationControl;
 @property (strong, nonatomic) UISegmentedControl *endgameControl;
 
-@property (strong, nonatomic) CounterControl *autoMobility;
-@property (strong, nonatomic) CounterControl *autoFuel;
-@property (strong, nonatomic) CounterControl *autoAmp;
-@property (strong, nonatomic) CounterControl *teleopSpeaker;
-@property (strong, nonatomic) CounterControl *teleopAmp;
-@property (strong, nonatomic) CounterControl *teleopFeed;
+@property (strong, nonatomic) CounterControl *autoFuelScored;
+@property (strong, nonatomic) CounterControl *autoFuelMissed;
+@property (strong, nonatomic) CounterControl *autoTowerLevel1;
+@property (strong, nonatomic) CounterControl *teleopFuelScored;
+@property (strong, nonatomic) CounterControl *teleopFuelMissed;
+@property (strong, nonatomic) CounterControl *teleopFuelInactive;
 @property (strong, nonatomic) CounterControl *fouls;
 @property (strong, nonatomic) CounterControl *defense;
 
@@ -36,7 +36,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"QRScout MECO";
+    self.title = @"QRScout REBUILT 2026";
     self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:1.0];
     [self createControls];
     [self configureNavigation];
@@ -59,14 +59,15 @@
     self.allianceControl = [[UISegmentedControl alloc] initWithItems:@[@"Red", @"Blue"]];
     self.stationControl = [[UISegmentedControl alloc] initWithItems:@[@"1", @"2", @"3"]];
     self.endgameControl =
-        [[UISegmentedControl alloc] initWithItems:@[@"None", @"Park", @"Climb", @"Fail"]];
+        [[UISegmentedControl alloc] initWithItems:@[@"None", @"Level 1", @"Level 2", @"Level 3"]];
 
-    self.autoMobility = [[CounterControl alloc] initWithTitle:@"Auto Mobility"];
-    self.autoFuel = [[CounterControl alloc] initWithTitle:@"Auto Fuel"];
-    self.autoAmp = [[CounterControl alloc] initWithTitle:@"Auto Amp"];
-    self.teleopSpeaker = [[CounterControl alloc] initWithTitle:@"Teleop Speaker"];
-    self.teleopAmp = [[CounterControl alloc] initWithTitle:@"Teleop Amp"];
-    self.teleopFeed = [[CounterControl alloc] initWithTitle:@"Fed Pieces"];
+    self.autoFuelScored = [[CounterControl alloc] initWithTitle:@"Auto Fuel Scored"];
+    self.autoFuelMissed = [[CounterControl alloc] initWithTitle:@"Auto Fuel Missed"];
+    self.autoTowerLevel1 = [[CounterControl alloc] initWithTitle:@"Auto Tower Level 1"];
+    self.autoTowerLevel1.maximumValue = 1;
+    self.teleopFuelScored = [[CounterControl alloc] initWithTitle:@"Teleop Fuel Scored (Active Hub)"];
+    self.teleopFuelMissed = [[CounterControl alloc] initWithTitle:@"Teleop Fuel Missed"];
+    self.teleopFuelInactive = [[CounterControl alloc] initWithTitle:@"Teleop Fuel (Inactive Hub)"];
     self.fouls = [[CounterControl alloc] initWithTitle:@"Fouls"];
     self.defense = [[CounterControl alloc] initWithTitle:@"Defense Rating"];
     self.defense.maximumValue = 5;
@@ -135,16 +136,17 @@
         self.robotField
     ]]];
 
-    [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Autonomous" views:@[
-        self.autoMobility, self.autoFuel, self.autoAmp
+    [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Autonomous (20 seconds)" views:@[
+        self.autoFuelScored, self.autoFuelMissed, self.autoTowerLevel1
     ]]];
 
-    [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Teleop" views:@[
-        self.teleopSpeaker, self.teleopAmp, self.teleopFeed, self.fouls, self.defense
+    [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Teleop (2:20)" views:@[
+        self.teleopFuelScored, self.teleopFuelMissed, self.teleopFuelInactive,
+        self.fouls, self.defense
     ]]];
 
     [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Endgame & Notes" views:@[
-        [self labeledControlWithTitle:@"Endgame" control:self.endgameControl], self.commentsView
+        [self labeledControlWithTitle:@"Tower Level (endgame)" control:self.endgameControl], self.commentsView
     ]]];
 
     [self configureOutputSection];
@@ -250,8 +252,9 @@
 
 - (NSArray<CounterControl *> *)counterControls {
     return @[
-        self.autoMobility, self.autoFuel, self.autoAmp, self.teleopSpeaker,
-        self.teleopAmp, self.teleopFeed, self.fouls, self.defense
+        self.autoFuelScored, self.autoFuelMissed, self.autoTowerLevel1,
+        self.teleopFuelScored, self.teleopFuelMissed, self.teleopFuelInactive,
+        self.fouls, self.defense
     ];
 }
 
@@ -306,12 +309,12 @@
         [self selectedTitleForControl:self.allianceControl],
         [self selectedTitleForControl:self.stationControl],
         [PayloadBuilder sanitizeValue:self.robotField.text],
-        [NSString stringWithFormat:@"%ld", (long)self.autoMobility.value],
-        [NSString stringWithFormat:@"%ld", (long)self.autoFuel.value],
-        [NSString stringWithFormat:@"%ld", (long)self.autoAmp.value],
-        [NSString stringWithFormat:@"%ld", (long)self.teleopSpeaker.value],
-        [NSString stringWithFormat:@"%ld", (long)self.teleopAmp.value],
-        [NSString stringWithFormat:@"%ld", (long)self.teleopFeed.value],
+        [NSString stringWithFormat:@"%ld", (long)self.autoFuelScored.value],
+        [NSString stringWithFormat:@"%ld", (long)self.autoFuelMissed.value],
+        [NSString stringWithFormat:@"%ld", (long)self.autoTowerLevel1.value],
+        [NSString stringWithFormat:@"%ld", (long)self.teleopFuelScored.value],
+        [NSString stringWithFormat:@"%ld", (long)self.teleopFuelMissed.value],
+        [NSString stringWithFormat:@"%ld", (long)self.teleopFuelInactive.value],
         [NSString stringWithFormat:@"%ld", (long)self.fouls.value],
         [NSString stringWithFormat:@"%ld", (long)self.defense.value],
         [self selectedTitleForControl:self.endgameControl],

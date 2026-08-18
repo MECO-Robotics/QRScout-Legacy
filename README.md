@@ -1,12 +1,13 @@
 # QRScout Legacy
 
-QRScout Legacy is a dependency-free Objective-C/UIKit port of QRScout MECO for 64-bit iPads running iOS 9 or later. It is specifically configured for the iPad mini 2 on iOS 9.3.2 and iOS 12.5.8.
+QRScout Legacy is a dependency-free Objective-C/UIKit scouting app for the 2026 FIRST Robotics Competition game REBUILT, presented by Haas. It runs on 64-bit iPads including the iPad mini 2 on iOS 9.3.2 and iOS 12.5.8.
 
 The original workflow is preserved:
 
 - Prematch scout, match, team, alliance, station, and robot-note entry
-- Autonomous and teleop counters with the same ranges
-- Endgame selection and comments
+- REBUILT AUTO fuel scored/missed and this robot's AUTO Level 1 tower result
+- REBUILT TELEOP active-HUB fuel scored/missed and inactive-HUB fuel tracking
+- Endgame tower Level 1, Level 2, or Level 3 selection and comments
 - Live ISO-8859-1 QR generation
 - CSV payload and column-name clipboard actions
 - Commit confirmation
@@ -58,12 +59,16 @@ For a practical period toolchain, Xcode 10.x supports an iOS 9 deployment target
 
 Keep automatic date/time enabled on an older device before installing, since certificate validation is sensitive to the device clock.
 
+## REBUILT scouting contract
+
+REBUILT has a 20-second AUTO period followed by 2:20 of TELEOP. FUEL scored through an active HUB and TOWER levels are the game-specific scoring observations captured here. The app records missed fuel and fuel observed in an inactive HUB as scouting data; those observations do not themselves award match points. The official game manual defines AUTO Level 1 tower scoring for up to two alliance robots, and TELEOP tower Levels 1–3; this per-robot form records whether the selected robot achieved each result.
+
 ## Spreadsheet contract
 
 The QR payload remains a comma-separated row in this exact order:
 
 ```text
-scout,match,team,alliance,station,robotNotes,autoMobility,autoFuel,autoAmp,teleopSpeaker,teleopAmp,teleopFeed,fouls,defenseRating,endgame,comments
+scout,match,team,alliance,station,robotNotes,autoFuelScored,autoFuelMissed,autoTowerLevel1,teleopFuelScored,teleopFuelMissed,teleopFuelInactive,fouls,defenseRating,towerLevel,comments
 ```
 
 Commas and line feeds in free text are converted to spaces, matching the original app. The payload contract is covered by both the XCTest target and the command-line test script.
