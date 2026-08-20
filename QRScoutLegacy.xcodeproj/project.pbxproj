@@ -13,6 +13,7 @@
 		100000000000000000000004 /* CounterControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000007 /* CounterControl.m */; };
 		100000000000000000000005 /* PayloadBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000009 /* PayloadBuilder.m */; };
 		100000000000000000000006 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000B /* LaunchScreen.storyboard */; };
+		100000000000000000000010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000011 /* Assets.xcassets */; };
 		100000000000000000000007 /* PayloadBuilderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000C /* PayloadBuilderTests.m */; };
 		100000000000000000000008 /* PayloadBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000009 /* PayloadBuilder.m */; };
 		100000000000000000000009 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000E /* XCTest.framework */; };
@@ -35,6 +36,7 @@
 		20000000000000000000000E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		20000000000000000000000F /* QRScoutLegacy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QRScoutLegacy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		200000000000000000000010 /* QRScoutLegacyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QRScoutLegacyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		200000000000000000000011 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 				200000000000000000000009 /* PayloadBuilder.m */,
 				20000000000000000000000A /* Info.plist */,
 				20000000000000000000000B /* LaunchScreen.storyboard */,
+				200000000000000000000011 /* Assets.xcassets */,
 			);
 			path = QRScoutLegacy;
 			sourceTree = "<group>";
@@ -188,6 +191,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				100000000000000000000006 /* LaunchScreen.storyboard in Resources */,
+				100000000000000000000010 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +280,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = QRScoutLegacy/Info.plist;
@@ -291,6 +296,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = QRScoutLegacy/Info.plist;

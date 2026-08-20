@@ -13,6 +13,8 @@ The original workflow is preserved:
 - Commit confirmation
 - Reset behavior that keeps the scout/alliance and advances a numeric match number
 
+The interface uses a REBUILT navy/cyan/orange visual system with a branded header, rounded scouting cards, accent section markers, clearer counter controls, and an app icon built from the HUB/FUEL/TOWER motif in `QRScoutLegacy/Assets.xcassets`.
+
 ## Compatibility choices
 
 - Deployment target: iOS 9.0
@@ -38,6 +40,14 @@ The second command creates:
 - `build/Release-iphoneos/QRScoutLegacy.app`
 - `build/QRScoutLegacy-unsigned.ipa`
 
+To embed an optional no-cable update button and version the build:
+
+```sh
+APP_VERSION=1.1 BUILD_NUMBER=2 \
+QRSCOUT_UPDATE_URL=https://your-host.example/qrscout/manifest.plist \
+./scripts/build_legacy.sh
+```
+
 The script compiles for arm64 with an iOS 9.0 minimum, treats newer unguarded API use as an error, compiles the launch storyboard for the same minimum, and packages an unsigned IPA.
 
 To make a development build instead:
@@ -47,6 +57,20 @@ CONFIGURATION=Debug ./scripts/build_legacy.sh
 ```
 
 `BUILD_DIR=/absolute/path` can be used to place generated files elsewhere.
+
+## No-cable updates
+
+iOS does not allow an app to silently replace its own executable. This project supports the practical OTA workflow: host the IPA and an HTTPS OTA manifest, then tap **Update** inside the app. The app converts the manifest URL into an `itms-services` install request. The button is included only when `QRSCOUT_UPDATE_URL` is set during the build.
+
+Create a manifest for each new build with:
+
+```sh
+./scripts/make_manifest.sh \
+  https://your-host.example/qrscout/QRScoutLegacy.ipa \
+  public/qrscout/manifest.plist 1.1 2
+```
+
+Upload both files to the same HTTPS host. Future releases only require uploading the new IPA and replacing the manifest; the iPad does not need to be connected to the computer. On a jailbroken iOS 12 device, AppSync/Filza can install the unsigned IPA. A normally signed OTA IPA still requires a valid Apple signing identity and provisioning profile.
 
 ## Sign and install
 
