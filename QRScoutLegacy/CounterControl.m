@@ -1,9 +1,9 @@
 #import "CounterControl.h"
 
-@interface CounterControl ()
+@interface CounterControl () <UITextFieldDelegate>
 
 @property (nonatomic, readwrite) NSInteger value;
-@property (strong, nonatomic) UILabel *valueLabel;
+@property (strong, nonatomic) UITextField *valueField;
 
 @end
 
@@ -41,22 +41,27 @@
     UIButton *minusButton = [self buttonWithTitle:@"−" fontSize:26.0];
     [minusButton addTarget:self action:@selector(decrement) forControlEvents:UIControlEventTouchUpInside];
 
-    self.valueLabel = [[UILabel alloc] init];
-    self.valueLabel.text = @"0";
-    self.valueLabel.textAlignment = NSTextAlignmentCenter;
-    self.valueLabel.font = [UIFont monospacedDigitSystemFontOfSize:22.0 weight:UIFontWeightSemibold];
-    self.valueLabel.textColor = [UIColor whiteColor];
-    self.valueLabel.backgroundColor = [UIColor colorWithRed:0.04 green:0.09 blue:0.18 alpha:1.0];
-    self.valueLabel.layer.cornerRadius = 9.0;
-    self.valueLabel.layer.masksToBounds = YES;
-    [self.valueLabel.heightAnchor constraintEqualToConstant:40.0].active = YES;
-    [self.valueLabel.widthAnchor constraintEqualToConstant:44.0].active = YES;
+    self.valueField = [[UITextField alloc] init];
+    self.valueField.text = @"0";
+    self.valueField.textAlignment = NSTextAlignmentCenter;
+    self.valueField.font = [UIFont monospacedDigitSystemFontOfSize:22.0 weight:UIFontWeightSemibold];
+    self.valueField.textColor = [UIColor whiteColor];
+    self.valueField.backgroundColor = [UIColor colorWithRed:0.04 green:0.09 blue:0.18 alpha:1.0];
+    self.valueField.layer.cornerRadius = 9.0;
+    self.valueField.layer.masksToBounds = YES;
+    self.valueField.keyboardType = UIKeyboardTypeNumberPad;
+    self.valueField.delegate = self;
+    [self.valueField addTarget:self action:@selector(valueFieldBegan:) forControlEvents:UIControlEventEditingDidBegin];
+    [self.valueField addTarget:self action:@selector(valueFieldChanged:) forControlEvents:UIControlEventEditingChanged];
+    self.valueField.inputAccessoryView = [self numberPadToolbar];
+    [self.valueField.heightAnchor constraintEqualToConstant:40.0].active = YES;
+    [self.valueField.widthAnchor constraintEqualToConstant:52.0].active = YES;
 
     UIButton *plusButton = [self buttonWithTitle:@"+" fontSize:24.0];
     [plusButton addTarget:self action:@selector(increment) forControlEvents:UIControlEventTouchUpInside];
 
     UIStackView *stack = [[UIStackView alloc]
-        initWithArrangedSubviews:@[titleLabel, minusButton, self.valueLabel, plusButton]];
+        initWithArrangedSubviews:@[titleLabel, minusButton, self.valueField, plusButton]];
     stack.axis = UILayoutConstraintAxisHorizontal;
     stack.alignment = UIStackViewAlignmentCenter;
     stack.spacing = 10.0;
@@ -69,6 +74,46 @@
         [stack.topAnchor constraintEqualToAnchor:self.topAnchor],
         [stack.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
     ]];
+}
+
+- (UIToolbar *)numberPadToolbar {
+    UIToolbar *toolbar = [[UIToolbar alloc] init];
+    [toolbar sizeToFit];
+    UIBarButtonItem *flexibleSpace =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                      target:nil
+                                                      action:nil];
+    UIBarButtonItem *done =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                      target:self
+                                                      action:@selector(doneEditingValue:)];
+    toolbar.items = @[flexibleSpace, done];
+    return toolbar;
+}
+
+- (void)doneEditingValue:(id)sender {
+    [self.valueField resignFirstResponder];
+    [self commitTypedValue];
+}
+
+- (void)valueFieldChanged:(UITextField *)field {
+    if (field.text.length > 0) {
+        [self commitTypedValue];
+    }
+}
+
+- (void)commitTypedValue {
+    NSInteger typedValue = self.valueField.text.length > 0 ? self.valueField.text.integerValue : self.minimumValue;
+    self.value = typedValue;
+    [self sendActionsForControlEvents:UIControlEventValueChanged];
+}
+
+- (void)valueFieldBegan:(UITextField *)field {
+    [field selectAll:nil];
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    [self commitTypedValue];
 }
 
 - (UIButton *)buttonWithTitle:(NSString *)title fontSize:(CGFloat)fontSize {
@@ -87,7 +132,7 @@
 - (void)setValue:(NSInteger)value {
     NSInteger boundedValue = MAX(self.minimumValue, MIN(self.maximumValue, value));
     _value = boundedValue;
-    self.valueLabel.text = [NSString stringWithFormat:@"%ld", (long)boundedValue];
+    self.valueField.text = [NSString stringWithFormat:@"%ld", (long)boundedValue];
 }
 
 - (void)reset {

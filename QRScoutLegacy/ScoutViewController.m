@@ -136,6 +136,8 @@
     }
     self.matchField.keyboardType = UIKeyboardTypeNumberPad;
     self.teamField.keyboardType = UIKeyboardTypeNumberPad;
+    self.matchField.inputAccessoryView = [self numberPadToolbar];
+    self.teamField.inputAccessoryView = [self numberPadToolbar];
     self.commentsView.delegate = self;
 
     self.allianceControl.selectedSegmentIndex = 0;
@@ -326,6 +328,25 @@
     field.autocapitalizationType = UITextAutocapitalizationTypeWords;
     [field.heightAnchor constraintEqualToConstant:44.0].active = YES;
     return field;
+}
+
+- (UIToolbar *)numberPadToolbar {
+    UIToolbar *toolbar = [[UIToolbar alloc] init];
+    [toolbar sizeToFit];
+    UIBarButtonItem *flexibleSpace =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                      target:nil
+                                                      action:nil];
+    UIBarButtonItem *done =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                      target:self
+                                                      action:@selector(doneEditingNumberField:)];
+    toolbar.items = @[flexibleSpace, done];
+    return toolbar;
+}
+
+- (void)doneEditingNumberField:(id)sender {
+    [self.view endEditing:YES];
 }
 
 - (UITextView *)notesTextView {
