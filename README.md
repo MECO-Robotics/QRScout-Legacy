@@ -13,7 +13,7 @@ The original workflow is preserved:
 - Commit confirmation
 - Reset behavior that keeps the scout/alliance and advances a numeric match number
 
-The interface uses a REBUILT navy/cyan/orange visual system with a gradient team header, rounded scouting cards, accent section markers, polished input fields, clearer counter controls, and an app icon branded for FRC Team 8324 MECO Robotics in `QRScoutLegacy/Assets.xcassets`.
+The interface uses a REBUILT navy/red/white MECO Robotics visual system with a gradient team header, rounded scouting cards, red accent markers, polished input fields, clearer counter controls, and an app icon branded for FRC Team 8324 MECO Robotics in `QRScoutLegacy/Assets.xcassets`.
 
 ## Compatibility choices
 

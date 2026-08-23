@@ -147,7 +147,7 @@
     self.endgameControl.selectedSegmentIndex = 0;
     for (UISegmentedControl *control in
          @[self.allianceControl, self.stationControl, self.endgameControl]) {
-        control.tintColor = [self orangeColor];
+        control.tintColor = [self redColor];
         control.apportionsSegmentWidthsByContent = YES;
         [control addTarget:self action:@selector(formChanged) forControlEvents:UIControlEventValueChanged];
     }
@@ -196,7 +196,7 @@
     UILabel *eyebrow = [[UILabel alloc] init];
     eyebrow.text = @"FRC 2026  •  TEAM 8324  •  MATCH SCOUTING";
     eyebrow.font = [UIFont boldSystemFontOfSize:11.0];
-    eyebrow.textColor = [self cyanColor];
+    eyebrow.textColor = [self redColor];
 
     UILabel *title = [[UILabel alloc] init];
     title.text = @"REBUILT";
@@ -220,7 +220,7 @@
         [stack.bottomAnchor constraintEqualToAnchor:hero.bottomAnchor constant:-17.0]
     ]];
     UIView *accent = [[UIView alloc] init];
-    accent.backgroundColor = [self orangeColor];
+    accent.backgroundColor = [self redColor];
     accent.layer.cornerRadius = 2.0;
     accent.translatesAutoresizingMaskIntoConstraints = NO;
     [hero addSubview:accent];
@@ -260,7 +260,7 @@
     [columnsButton addTarget:self action:@selector(copyColumnsTapped) forControlEvents:UIControlEventTouchUpInside];
 
     for (UIButton *button in @[copyButton, columnsButton]) {
-        button.backgroundColor = [self orangeColor];
+        button.backgroundColor = [self redColor];
         [button setTitleColor:[self navyColor] forState:UIControlStateNormal];
         button.titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
         button.layer.cornerRadius = 10.0;
@@ -289,7 +289,7 @@
     label.textColor = [self navyColor];
 
     UIView *accent = [[UIView alloc] init];
-    accent.backgroundColor = [self orangeColor];
+    accent.backgroundColor = [self redColor];
     [accent.widthAnchor constraintEqualToConstant:5.0].active = YES;
     [accent.heightAnchor constraintEqualToConstant:23.0].active = YES;
     UIStackView *header = [[UIStackView alloc] initWithArrangedSubviews:@[accent, label]];
@@ -387,20 +387,16 @@
     return [UIColor colorWithRed:0.04 green:0.09 blue:0.18 alpha:1.0];
 }
 
-- (UIColor *)cyanColor {
-    return [UIColor colorWithRed:0.12 green:0.78 blue:0.82 alpha:1.0];
-}
-
-- (UIColor *)orangeColor {
-    return [UIColor colorWithRed:1.0 green:0.52 blue:0.08 alpha:1.0];
+- (UIColor *)redColor {
+    return [UIColor colorWithRed:0.88 green:0.08 blue:0.12 alpha:1.0];
 }
 
 - (UIColor *)canvasColor {
-    return [UIColor colorWithRed:0.94 green:0.96 blue:0.98 alpha:1.0];
+    return [UIColor colorWithRed:0.94 green:0.95 blue:0.97 alpha:1.0];
 }
 
 - (UIColor *)borderColor {
-    return [UIColor colorWithRed:0.85 green:0.89 blue:0.93 alpha:1.0];
+    return [UIColor colorWithRed:0.82 green:0.84 blue:0.89 alpha:1.0];
 }
 
 - (UIColor *)whiteColor {

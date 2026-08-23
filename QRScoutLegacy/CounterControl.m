@@ -25,7 +25,7 @@
     self.backgroundColor = [UIColor whiteColor];
     self.layer.cornerRadius = 14.0;
     self.layer.borderWidth = 1.0;
-    self.layer.borderColor = [UIColor colorWithRed:0.79 green:0.86 blue:0.91 alpha:1.0].CGColor;
+    self.layer.borderColor = [UIColor colorWithRed:0.86 green:0.72 blue:0.74 alpha:1.0].CGColor;
     [self.heightAnchor constraintEqualToConstant:58.0].active = YES;
 
     UILabel *titleLabel = [[UILabel alloc] init];
@@ -122,7 +122,7 @@
     [button setTitleColor:[UIColor colorWithRed:0.04 green:0.09 blue:0.18 alpha:1.0]
                   forState:UIControlStateNormal];
     button.titleLabel.font = [UIFont boldSystemFontOfSize:fontSize];
-    button.backgroundColor = [UIColor colorWithRed:0.12 green:0.78 blue:0.82 alpha:0.22];
+    button.backgroundColor = [UIColor colorWithRed:0.88 green:0.08 blue:0.12 alpha:0.14];
     button.layer.cornerRadius = 12.0;
     [button.widthAnchor constraintEqualToConstant:44.0].active = YES;
     [button.heightAnchor constraintEqualToConstant:40.0].active = YES;
