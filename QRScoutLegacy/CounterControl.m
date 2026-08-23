@@ -22,15 +22,15 @@
 }
 
 - (void)configureWithTitle:(NSString *)title {
-    self.backgroundColor = [UIColor colorWithRed:0.97 green:0.98 blue:0.99 alpha:1.0];
-    self.layer.cornerRadius = 11.0;
+    self.backgroundColor = [UIColor whiteColor];
+    self.layer.cornerRadius = 14.0;
     self.layer.borderWidth = 1.0;
-    self.layer.borderColor = [UIColor colorWithRed:0.88 green:0.91 blue:0.95 alpha:1.0].CGColor;
-    [self.heightAnchor constraintEqualToConstant:52.0].active = YES;
+    self.layer.borderColor = [UIColor colorWithRed:0.79 green:0.86 blue:0.91 alpha:1.0].CGColor;
+    [self.heightAnchor constraintEqualToConstant:58.0].active = YES;
 
     UILabel *titleLabel = [[UILabel alloc] init];
     titleLabel.text = title;
-    titleLabel.font = [UIFont systemFontOfSize:15.0 weight:UIFontWeightSemibold];
+    titleLabel.font = [UIFont systemFontOfSize:15.0 weight:UIFontWeightMedium];
     titleLabel.textColor = [UIColor colorWithRed:0.04 green:0.09 blue:0.18 alpha:1.0];
     titleLabel.numberOfLines = 2;
     titleLabel.adjustsFontSizeToFitWidth = YES;
@@ -122,8 +122,8 @@
     [button setTitleColor:[UIColor colorWithRed:0.04 green:0.09 blue:0.18 alpha:1.0]
                   forState:UIControlStateNormal];
     button.titleLabel.font = [UIFont boldSystemFontOfSize:fontSize];
-    button.backgroundColor = [UIColor colorWithRed:0.12 green:0.78 blue:0.82 alpha:0.18];
-    button.layer.cornerRadius = 10.0;
+    button.backgroundColor = [UIColor colorWithRed:0.12 green:0.78 blue:0.82 alpha:0.22];
+    button.layer.cornerRadius = 12.0;
     [button.widthAnchor constraintEqualToConstant:44.0].active = YES;
     [button.heightAnchor constraintEqualToConstant:40.0].active = YES;
     return button;

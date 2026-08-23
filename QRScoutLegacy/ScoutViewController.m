@@ -1,5 +1,6 @@
 #import "ScoutViewController.h"
 #import <CoreImage/CoreImage.h>
+#import <QuartzCore/QuartzCore.h>
 #import "CounterControl.h"
 #import "PayloadBuilder.h"
 
@@ -36,7 +37,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"QRScout REBUILT 2026";
+    self.title = @"REBUILT  •  8324";
     self.view.backgroundColor = [self canvasColor];
     [self createControls];
     [self configureNavigation];
@@ -78,6 +79,7 @@
     self.navigationController.navigationBar.barTintColor = [self navyColor];
     self.navigationController.navigationBar.tintColor = [self whiteColor];
     self.navigationController.navigationBar.translucent = NO;
+    self.navigationController.navigationBar.shadowImage = [UIImage new];
     self.navigationController.navigationBar.titleTextAttributes = @{
         NSForegroundColorAttributeName: [self whiteColor],
         NSFontAttributeName: [UIFont boldSystemFontOfSize:17.0]
@@ -108,7 +110,7 @@
 - (void)configureLayout {
     self.scrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.contentStack.axis = UILayoutConstraintAxisVertical;
-    self.contentStack.spacing = 14.0;
+    self.contentStack.spacing = 16.0;
     self.contentStack.translatesAutoresizingMaskIntoConstraints = NO;
 
     [self.view addSubview:self.scrollView];
@@ -145,6 +147,8 @@
     self.endgameControl.selectedSegmentIndex = 0;
     for (UISegmentedControl *control in
          @[self.allianceControl, self.stationControl, self.endgameControl]) {
+        control.tintColor = [self orangeColor];
+        control.apportionsSegmentWidthsByContent = YES;
         [control addTarget:self action:@selector(formChanged) forControlEvents:UIControlEventValueChanged];
     }
 
@@ -177,7 +181,12 @@
 
 - (UIView *)heroHeader {
     UIView *hero = [[UIView alloc] init];
-    hero.backgroundColor = [self navyColor];
+    CAGradientLayer *gradient = [CAGradientLayer layer];
+    gradient.colors = @[(id)[self navyColor].CGColor, (id)[UIColor colorWithRed:0.02 green:0.22 blue:0.36 alpha:1.0].CGColor];
+    gradient.startPoint = CGPointMake(0.0, 0.0);
+    gradient.endPoint = CGPointMake(1.0, 1.0);
+    gradient.frame = CGRectMake(0.0, 0.0, 1400.0, 180.0);
+    [hero.layer insertSublayer:gradient atIndex:0];
     hero.layer.cornerRadius = 16.0;
     hero.layer.shadowColor = [UIColor blackColor].CGColor;
     hero.layer.shadowOpacity = 0.16;
@@ -185,7 +194,7 @@
     hero.layer.shadowOffset = CGSizeMake(0.0, 5.0);
 
     UILabel *eyebrow = [[UILabel alloc] init];
-    eyebrow.text = @"FRC 2026  •  MATCH SCOUTING";
+    eyebrow.text = @"FRC 2026  •  TEAM 8324  •  MATCH SCOUTING";
     eyebrow.font = [UIFont boldSystemFontOfSize:11.0];
     eyebrow.textColor = [self cyanColor];
 
@@ -195,7 +204,7 @@
     title.textColor = [self whiteColor];
 
     UILabel *subtitle = [[UILabel alloc] init];
-    subtitle.text = @"Fuel. Hub control. Tower climbs.";
+    subtitle.text = @"MECO ROBOTICS  /  FUEL • HUB • TOWER";
     subtitle.font = [UIFont systemFontOfSize:14.0];
     subtitle.textColor = [UIColor colorWithWhite:0.78 alpha:1.0];
 
@@ -209,6 +218,17 @@
         [stack.trailingAnchor constraintEqualToAnchor:hero.trailingAnchor constant:-18.0],
         [stack.topAnchor constraintEqualToAnchor:hero.topAnchor constant:17.0],
         [stack.bottomAnchor constraintEqualToAnchor:hero.bottomAnchor constant:-17.0]
+    ]];
+    UIView *accent = [[UIView alloc] init];
+    accent.backgroundColor = [self orangeColor];
+    accent.layer.cornerRadius = 2.0;
+    accent.translatesAutoresizingMaskIntoConstraints = NO;
+    [hero addSubview:accent];
+    [NSLayoutConstraint activateConstraints:@[
+        [accent.leadingAnchor constraintEqualToAnchor:hero.leadingAnchor constant:18.0],
+        [accent.topAnchor constraintEqualToAnchor:hero.topAnchor],
+        [accent.widthAnchor constraintEqualToConstant:54.0],
+        [accent.heightAnchor constraintEqualToConstant:5.0]
     ]];
     return hero;
 }
@@ -240,7 +260,7 @@
     [columnsButton addTarget:self action:@selector(copyColumnsTapped) forControlEvents:UIControlEventTouchUpInside];
 
     for (UIButton *button in @[copyButton, columnsButton]) {
-        button.backgroundColor = [self cyanColor];
+        button.backgroundColor = [self orangeColor];
         [button setTitleColor:[self navyColor] forState:UIControlStateNormal];
         button.titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
         button.layer.cornerRadius = 10.0;
@@ -260,6 +280,8 @@
     card.layer.shadowOpacity = 0.07;
     card.layer.shadowRadius = 9.0;
     card.layer.shadowOffset = CGSizeMake(0.0, 3.0);
+    card.layer.borderColor = [self borderColor].CGColor;
+    card.layer.borderWidth = 1.0;
 
     UILabel *label = [[UILabel alloc] init];
     label.text = title;
@@ -314,8 +336,9 @@
 - (UITextField *)textFieldWithPlaceholder:(NSString *)placeholder {
     UITextField *field = [[UITextField alloc] init];
     field.placeholder = placeholder;
+    field.font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
     field.borderStyle = UITextBorderStyleNone;
-    field.backgroundColor = [UIColor colorWithWhite:0.98 alpha:1.0];
+    field.backgroundColor = [UIColor colorWithWhite:0.985 alpha:1.0];
     field.layer.cornerRadius = 10.0;
     field.layer.borderWidth = 1.0;
     field.layer.borderColor = [self borderColor].CGColor;
@@ -326,7 +349,7 @@
     field.returnKeyType = UIReturnKeyDone;
     field.autocorrectionType = UITextAutocorrectionTypeNo;
     field.autocapitalizationType = UITextAutocapitalizationTypeWords;
-    [field.heightAnchor constraintEqualToConstant:44.0].active = YES;
+    [field.heightAnchor constraintEqualToConstant:48.0].active = YES;
     return field;
 }
 
