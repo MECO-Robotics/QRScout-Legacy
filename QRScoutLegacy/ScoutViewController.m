@@ -1,6 +1,7 @@
 #import "ScoutViewController.h"
 #import <CoreImage/CoreImage.h>
 #import <QuartzCore/QuartzCore.h>
+#import "ChoiceControl.h"
 #import "CounterControl.h"
 #import "PayloadBuilder.h"
 
@@ -11,24 +12,37 @@
 @property (strong, nonatomic) UIImageView *qrImageView;
 @property (strong, nonatomic) UITextView *payloadTextView;
 
-@property (strong, nonatomic) UITextField *scoutField;
-@property (strong, nonatomic) UITextField *matchField;
-@property (strong, nonatomic) UITextField *teamField;
-@property (strong, nonatomic) UITextField *robotField;
+@property (strong, nonatomic) UITextField *scouterInitialsField;
+@property (strong, nonatomic) UITextField *matchNumberField;
+@property (strong, nonatomic) UITextField *teamNumberField;
 @property (strong, nonatomic) UITextView *commentsView;
 
-@property (strong, nonatomic) UISegmentedControl *allianceControl;
-@property (strong, nonatomic) UISegmentedControl *stationControl;
-@property (strong, nonatomic) UISegmentedControl *endgameControl;
+@property (strong, nonatomic) ChoiceControl *startingPosition;
+@property (strong, nonatomic) ChoiceControl *noShow;
+@property (strong, nonatomic) ChoiceControl *autoFuelCollection;
+@property (strong, nonatomic) ChoiceControl *autoAdditionalActions;
+@property (strong, nonatomic) ChoiceControl *autoStuck;
+@property (strong, nonatomic) ChoiceControl *autoClimbed;
+@property (strong, nonatomic) ChoiceControl *bumpTrench;
+@property (strong, nonatomic) ChoiceControl *defendedByOpponent;
+@property (strong, nonatomic) ChoiceControl *opposingZoneActions;
+@property (strong, nonatomic) ChoiceControl *endgameClimbed;
+@property (strong, nonatomic) ChoiceControl *mechanicalIssue;
+@property (strong, nonatomic) ChoiceControl *died;
+@property (strong, nonatomic) ChoiceControl *tipped;
+@property (strong, nonatomic) ChoiceControl *scoredHow;
+@property (strong, nonatomic) ChoiceControl *scoringLocation;
+@property (strong, nonatomic) ChoiceControl *passedHow;
+@property (strong, nonatomic) ChoiceControl *card;
+@property (strong, nonatomic) ChoiceControl *firstPick;
+@property (strong, nonatomic) ChoiceControl *secondPick;
 
 @property (strong, nonatomic) CounterControl *autoFuelScored;
-@property (strong, nonatomic) CounterControl *autoFuelMissed;
-@property (strong, nonatomic) CounterControl *autoTowerLevel1;
 @property (strong, nonatomic) CounterControl *teleopFuelScored;
-@property (strong, nonatomic) CounterControl *teleopFuelMissed;
-@property (strong, nonatomic) CounterControl *teleopFuelInactive;
-@property (strong, nonatomic) CounterControl *fouls;
-@property (strong, nonatomic) CounterControl *defense;
+@property (strong, nonatomic) CounterControl *fuelFed;
+@property (strong, nonatomic) CounterControl *scoringEffectiveness;
+@property (strong, nonatomic) CounterControl *feedingPassingSkill;
+@property (strong, nonatomic) CounterControl *defenseSkill;
 
 @end
 
@@ -37,7 +51,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"REBUILT  •  8324";
+    self.title = @"MECO 8324  •  QRSCOUT";
     self.view.backgroundColor = [self canvasColor];
     [self createControls];
     [self configureNavigation];
@@ -51,27 +65,95 @@
     self.qrImageView = [[UIImageView alloc] init];
     self.payloadTextView = [[UITextView alloc] init];
 
-    self.scoutField = [self textFieldWithPlaceholder:@"Scout name"];
-    self.matchField = [self textFieldWithPlaceholder:@"Match"];
-    self.teamField = [self textFieldWithPlaceholder:@"Team"];
-    self.robotField = [self textFieldWithPlaceholder:@"Robot notes"];
+    self.scouterInitialsField = [self textFieldWithPlaceholder:@"Initials"];
+    self.matchNumberField = [self textFieldWithPlaceholder:@"Match"];
+    self.teamNumberField = [self textFieldWithPlaceholder:@"Team"];
     self.commentsView = [self notesTextView];
 
-    self.allianceControl = [[UISegmentedControl alloc] initWithItems:@[@"Red", @"Blue"]];
-    self.stationControl = [[UISegmentedControl alloc] initWithItems:@[@"1", @"2", @"3"]];
-    self.endgameControl =
-        [[UISegmentedControl alloc] initWithItems:@[@"None", @"Level 1", @"Level 2", @"Level 3"]];
+    self.startingPosition = [[ChoiceControl alloc]
+        initWithTitles:@[@"Outpost Trench", @"Outpost Bump — Trench", @"Outpost Bump — Hub",
+                         @"Hub", @"Depot Bump — Hub", @"Depot Bump — Trench", @"Depot Trench"]
+                 values:@[@"OT", @"OBFT", @"OBFH", @"H", @"DBFH", @"DBFT", @"DT"]
+        allowsMultipleSelection:NO
+          defaultValues:@[]];
+    self.noShow = [[ChoiceControl alloc]
+        initWithTitles:@[@"No", @"Yes"] values:@[@"false", @"true"]
+        allowsMultipleSelection:NO defaultValues:@[@"false"]];
+    self.autoFuelCollection = [[ChoiceControl alloc]
+        initWithTitles:@[@"Outpost", @"Depot", @"Neutral Zone", @"Neutral Zone — 2nd Pass",
+                         @"Did Not Move", @"Moved Without Collecting"]
+                 values:@[@"1", @"2", @"3", @"4", @"5", @"6"]
+        allowsMultipleSelection:YES
+          defaultValues:@[]];
+    self.autoAdditionalActions = [[ChoiceControl alloc]
+        initWithTitles:@[@"Passed", @"Bump", @"Trench"] values:@[@"1", @"2", @"3"]
+        allowsMultipleSelection:YES defaultValues:@[]];
+    self.autoStuck = [[ChoiceControl alloc]
+        initWithTitles:@[@"No", @"Yes"] values:@[@"false", @"true"]
+        allowsMultipleSelection:NO defaultValues:@[@"false"]];
+    self.autoClimbed = [[ChoiceControl alloc]
+        initWithTitles:@[@"No Climb", @"Climbed", @"Failed Climb"] values:@[@"No", @"C", @"F"]
+        allowsMultipleSelection:NO defaultValues:@[@"No"]];
+    self.bumpTrench = [[ChoiceControl alloc]
+        initWithTitles:@[@"Bump", @"Trench"] values:@[@"1", @"2"]
+        allowsMultipleSelection:YES defaultValues:@[]];
+    self.defendedByOpponent = [[ChoiceControl alloc]
+        initWithTitles:@[@"No", @"Yes"] values:@[@"false", @"true"]
+        allowsMultipleSelection:NO defaultValues:@[@"false"]];
+    self.opposingZoneActions = [[ChoiceControl alloc]
+        initWithTitles:@[@"Collecting", @"Defense"] values:@[@"1", @"2"]
+        allowsMultipleSelection:YES defaultValues:@[]];
+    self.endgameClimbed = [[ChoiceControl alloc]
+        initWithTitles:@[@"No Climb", @"Level 1", @"Level 2", @"Level 3", @"Failed Climb"]
+                 values:@[@"No", @"L1", @"L2", @"L3", @"F"]
+        allowsMultipleSelection:NO
+          defaultValues:@[@"No"]];
+    self.mechanicalIssue = [[ChoiceControl alloc]
+        initWithTitles:@[@"No", @"Yes"] values:@[@"false", @"true"]
+        allowsMultipleSelection:NO defaultValues:@[@"false"]];
+    self.died = [[ChoiceControl alloc]
+        initWithTitles:@[@"No", @"Yes"] values:@[@"false", @"true"]
+        allowsMultipleSelection:NO defaultValues:@[@"false"]];
+    self.tipped = [[ChoiceControl alloc]
+        initWithTitles:@[@"No", @"Yes"] values:@[@"false", @"true"]
+        allowsMultipleSelection:NO defaultValues:@[@"false"]];
+    self.scoredHow = [[ChoiceControl alloc]
+        initWithTitles:@[@"While Driving", @"While Stationary", @"Both", @"No Scoring"]
+                 values:@[@"driving", @"stationary", @"both", @"none"]
+        allowsMultipleSelection:NO
+          defaultValues:@[]];
+    self.scoringLocation = [[ChoiceControl alloc]
+        initWithTitles:@[@"Outpost Trench", @"Outpost", @"Hub", @"Ladder", @"Depot", @"Depot Trench"]
+                 values:@[@"1", @"2", @"3", @"4", @"5", @"6"]
+        allowsMultipleSelection:YES
+          defaultValues:@[]];
+    self.passedHow = [[ChoiceControl alloc]
+        initWithTitles:@[@"While Driving", @"While Stationary", @"Both", @"No Passing"]
+                 values:@[@"driving", @"stationary", @"both", @"none"]
+        allowsMultipleSelection:NO
+          defaultValues:@[]];
+    self.card = [[ChoiceControl alloc]
+        initWithTitles:@[@"No Card", @"Yellow Card", @"Red Card"] values:@[@"No Card", @"Yellow", @"Red"]
+        allowsMultipleSelection:NO defaultValues:@[@"No Card"]];
+    self.firstPick = [[ChoiceControl alloc]
+        initWithTitles:@[@"Yes", @"Maybe", @"No"] values:@[@"Yes", @"May", @"No"]
+        allowsMultipleSelection:NO defaultValues:@[]];
+    self.secondPick = [[ChoiceControl alloc]
+        initWithTitles:@[@"Yes", @"Maybe", @"No"] values:@[@"Yes", @"May", @"No"]
+        allowsMultipleSelection:NO defaultValues:@[]];
 
     self.autoFuelScored = [[CounterControl alloc] initWithTitle:@"Auto Fuel Scored"];
-    self.autoFuelMissed = [[CounterControl alloc] initWithTitle:@"Auto Fuel Missed"];
-    self.autoTowerLevel1 = [[CounterControl alloc] initWithTitle:@"Auto Tower Level 1"];
-    self.autoTowerLevel1.maximumValue = 1;
-    self.teleopFuelScored = [[CounterControl alloc] initWithTitle:@"Teleop Fuel Scored (Active Hub)"];
-    self.teleopFuelMissed = [[CounterControl alloc] initWithTitle:@"Teleop Fuel Missed"];
-    self.teleopFuelInactive = [[CounterControl alloc] initWithTitle:@"Teleop Fuel (Inactive Hub)"];
-    self.fouls = [[CounterControl alloc] initWithTitle:@"Fouls"];
-    self.defense = [[CounterControl alloc] initWithTitle:@"Defense Rating"];
-    self.defense.maximumValue = 5;
+    self.autoFuelScored.maximumValue = 500;
+    self.teleopFuelScored = [[CounterControl alloc] initWithTitle:@"Teleop Fuel Scored"];
+    self.teleopFuelScored.maximumValue = 500;
+    self.fuelFed = [[CounterControl alloc] initWithTitle:@"Fuel Fed (Herded & Passed)"];
+    self.fuelFed.maximumValue = 500;
+    self.scoringEffectiveness = [[CounterControl alloc] initWithTitle:@"Scoring Effectiveness (0–5)"];
+    self.scoringEffectiveness.maximumValue = 5;
+    self.feedingPassingSkill = [[CounterControl alloc] initWithTitle:@"Feeding / Passing Skill (0–5)"];
+    self.feedingPassingSkill.maximumValue = 5;
+    self.defenseSkill = [[CounterControl alloc] initWithTitle:@"Defense Skill (0–5)"];
+    self.defenseSkill.maximumValue = 5;
 }
 
 - (void)configureNavigation {
@@ -131,24 +213,18 @@
     [self.contentStack addArrangedSubview:[self heroHeader]];
 
     NSArray<UITextField *> *fields =
-        @[self.scoutField, self.matchField, self.teamField, self.robotField];
+        @[self.scouterInitialsField, self.matchNumberField, self.teamNumberField];
     for (UITextField *field in fields) {
         field.delegate = self;
         [field addTarget:self action:@selector(formChanged) forControlEvents:UIControlEventEditingChanged];
     }
-    self.matchField.keyboardType = UIKeyboardTypeNumberPad;
-    self.teamField.keyboardType = UIKeyboardTypeNumberPad;
-    self.matchField.inputAccessoryView = [self numberPadToolbar];
-    self.teamField.inputAccessoryView = [self numberPadToolbar];
+    self.matchNumberField.keyboardType = UIKeyboardTypeNumberPad;
+    self.teamNumberField.keyboardType = UIKeyboardTypeNumberPad;
+    self.matchNumberField.inputAccessoryView = [self numberPadToolbar];
+    self.teamNumberField.inputAccessoryView = [self numberPadToolbar];
     self.commentsView.delegate = self;
 
-    self.allianceControl.selectedSegmentIndex = 0;
-    self.stationControl.selectedSegmentIndex = 0;
-    self.endgameControl.selectedSegmentIndex = 0;
-    for (UISegmentedControl *control in
-         @[self.allianceControl, self.stationControl, self.endgameControl]) {
-        control.tintColor = [self redColor];
-        control.apportionsSegmentWidthsByContent = YES;
+    for (ChoiceControl *control in [self choiceControls]) {
         [control addTarget:self action:@selector(formChanged) forControlEvents:UIControlEventValueChanged];
     }
 
@@ -157,23 +233,49 @@
     }
 
     [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Prematch" views:@[
-        [self rowWithViews:@[self.scoutField, self.matchField, self.teamField]],
-        [self labeledControlWithTitle:@"Alliance" control:self.allianceControl],
-        [self labeledControlWithTitle:@"Station" control:self.stationControl],
-        self.robotField
+        [self rowWithViews:@[
+            [self labeledViewWithTitle:@"Scouter Initials" view:self.scouterInitialsField],
+            [self labeledViewWithTitle:@"Match Number" view:self.matchNumberField],
+            [self labeledViewWithTitle:@"Team Number" view:self.teamNumberField]
+        ]],
+        [self labeledViewWithTitle:@"Starting Position" view:self.startingPosition],
+        [self labeledViewWithTitle:@"No Show" view:self.noShow]
     ]]];
 
     [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Autonomous (20 seconds)" views:@[
-        self.autoFuelScored, self.autoFuelMissed, self.autoTowerLevel1
+        self.autoFuelScored,
+        [self labeledViewWithTitle:@"Where Collected Fuel" view:self.autoFuelCollection],
+        [self labeledViewWithTitle:@"Other Auto Actions" view:self.autoAdditionalActions],
+        [self labeledViewWithTitle:@"Robot Stuck or A-Stop in Auto" view:self.autoStuck],
+        [self labeledViewWithTitle:@"Climbed in Auto" view:self.autoClimbed]
     ]]];
 
     [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Teleop (2:20)" views:@[
-        self.teleopFuelScored, self.teleopFuelMissed, self.teleopFuelInactive,
-        self.fouls, self.defense
+        self.teleopFuelScored,
+        [self labeledViewWithTitle:@"Bump / Trench" view:self.bumpTrench],
+        [self labeledViewWithTitle:@"Defended by Opponent" view:self.defendedByOpponent],
+        self.fuelFed,
+        [self labeledViewWithTitle:@"Opposing Zone Actions" view:self.opposingZoneActions]
     ]]];
 
-    [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Endgame & Notes" views:@[
-        [self labeledControlWithTitle:@"Tower Level (endgame)" control:self.endgameControl], self.commentsView
+    [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Endgame & Robot Health" views:@[
+        [self labeledViewWithTitle:@"Climbed" view:self.endgameClimbed],
+        [self labeledViewWithTitle:@"Mechanical Issue" view:self.mechanicalIssue],
+        [self labeledViewWithTitle:@"Died" view:self.died],
+        [self labeledViewWithTitle:@"Tipped / Fell Over" view:self.tipped]
+    ]]];
+
+    [self.contentStack addArrangedSubview:[self sectionWithTitle:@"Postmatch Ratings" views:@[
+        self.scoringEffectiveness,
+        [self labeledViewWithTitle:@"Scored How?" view:self.scoredHow],
+        [self labeledViewWithTitle:@"Scoring Location" view:self.scoringLocation],
+        self.feedingPassingSkill,
+        [self labeledViewWithTitle:@"Passed How?" view:self.passedHow],
+        self.defenseSkill,
+        [self labeledViewWithTitle:@"Yellow / Red Card" view:self.card],
+        [self labeledViewWithTitle:@"First Pick (Scoring)" view:self.firstPick],
+        [self labeledViewWithTitle:@"Second Pick (Passing / Defense)" view:self.secondPick],
+        [self labeledViewWithTitle:@"Comments" view:self.commentsView]
     ]]];
 
     [self configureOutputSection];
@@ -181,54 +283,72 @@
 
 - (UIView *)heroHeader {
     UIView *hero = [[UIView alloc] init];
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.colors = @[(id)[self navyColor].CGColor, (id)[UIColor colorWithRed:0.02 green:0.22 blue:0.36 alpha:1.0].CGColor];
-    gradient.startPoint = CGPointMake(0.0, 0.0);
-    gradient.endPoint = CGPointMake(1.0, 1.0);
-    gradient.frame = CGRectMake(0.0, 0.0, 1400.0, 180.0);
-    [hero.layer insertSublayer:gradient atIndex:0];
-    hero.layer.cornerRadius = 16.0;
+    hero.backgroundColor = [UIColor whiteColor];
+    hero.layer.cornerRadius = 18.0;
+    hero.layer.borderColor = [self navyColor].CGColor;
+    hero.layer.borderWidth = 3.0;
     hero.layer.shadowColor = [UIColor blackColor].CGColor;
-    hero.layer.shadowOpacity = 0.16;
-    hero.layer.shadowRadius = 10.0;
-    hero.layer.shadowOffset = CGSizeMake(0.0, 5.0);
+    hero.layer.shadowOpacity = 0.12;
+    hero.layer.shadowRadius = 12.0;
+    hero.layer.shadowOffset = CGSizeMake(0.0, 6.0);
+
+    UIImageView *teamLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TeamLogo"]];
+    teamLogo.contentMode = UIViewContentModeScaleAspectFit;
+    teamLogo.accessibilityLabel = @"MECO Robotics Team 8324 logo";
+    [teamLogo.widthAnchor constraintEqualToConstant:112.0].active = YES;
+    [teamLogo.heightAnchor constraintEqualToConstant:112.0].active = YES;
 
     UILabel *eyebrow = [[UILabel alloc] init];
-    eyebrow.text = @"FRC 2026  •  TEAM 8324  •  MATCH SCOUTING";
-    eyebrow.font = [UIFont boldSystemFontOfSize:11.0];
+    eyebrow.text = @"FRC TEAM 8324";
+    eyebrow.font = [UIFont boldSystemFontOfSize:12.0];
     eyebrow.textColor = [self redColor];
 
     UILabel *title = [[UILabel alloc] init];
-    title.text = @"REBUILT";
-    title.font = [UIFont boldSystemFontOfSize:30.0];
-    title.textColor = [self whiteColor];
+    title.text = @"MECO ROBOTICS";
+    title.font = [UIFont boldSystemFontOfSize:27.0];
+    title.textColor = [self navyColor];
+    title.adjustsFontSizeToFitWidth = YES;
+    title.minimumScaleFactor = 0.75;
+
+    UIView *divider = [[UIView alloc] init];
+    divider.backgroundColor = [self redColor];
+    divider.layer.cornerRadius = 2.0;
+    [divider.heightAnchor constraintEqualToConstant:4.0].active = YES;
 
     UILabel *subtitle = [[UILabel alloc] init];
-    subtitle.text = @"MECO ROBOTICS  /  FUEL • HUB • TOWER";
-    subtitle.font = [UIFont systemFontOfSize:14.0];
-    subtitle.textColor = [UIColor colorWithWhite:0.78 alpha:1.0];
+    subtitle.text = @"2026 REBUILT  •  MATCH SCOUTING";
+    subtitle.font = [UIFont systemFontOfSize:13.0 weight:UIFontWeightSemibold];
+    subtitle.textColor = [UIColor colorWithRed:0.34 green:0.38 blue:0.45 alpha:1.0];
 
-    UIStackView *stack = [[UIStackView alloc] initWithArrangedSubviews:@[eyebrow, title, subtitle]];
-    stack.axis = UILayoutConstraintAxisVertical;
-    stack.spacing = 4.0;
-    stack.translatesAutoresizingMaskIntoConstraints = NO;
-    [hero addSubview:stack];
+    UIStackView *textStack = [[UIStackView alloc]
+        initWithArrangedSubviews:@[eyebrow, title, divider, subtitle]];
+    textStack.axis = UILayoutConstraintAxisVertical;
+    textStack.spacing = 6.0;
+
+    UIStackView *headerStack = [[UIStackView alloc]
+        initWithArrangedSubviews:@[teamLogo, textStack]];
+    headerStack.axis = UILayoutConstraintAxisHorizontal;
+    headerStack.alignment = UIStackViewAlignmentCenter;
+    headerStack.spacing = 20.0;
+    headerStack.translatesAutoresizingMaskIntoConstraints = NO;
+    [hero addSubview:headerStack];
     [NSLayoutConstraint activateConstraints:@[
-        [stack.leadingAnchor constraintEqualToAnchor:hero.leadingAnchor constant:18.0],
-        [stack.trailingAnchor constraintEqualToAnchor:hero.trailingAnchor constant:-18.0],
-        [stack.topAnchor constraintEqualToAnchor:hero.topAnchor constant:17.0],
-        [stack.bottomAnchor constraintEqualToAnchor:hero.bottomAnchor constant:-17.0]
+        [headerStack.leadingAnchor constraintEqualToAnchor:hero.leadingAnchor constant:20.0],
+        [headerStack.trailingAnchor constraintEqualToAnchor:hero.trailingAnchor constant:-20.0],
+        [headerStack.topAnchor constraintEqualToAnchor:hero.topAnchor constant:18.0],
+        [headerStack.bottomAnchor constraintEqualToAnchor:hero.bottomAnchor constant:-22.0]
     ]];
+
     UIView *accent = [[UIView alloc] init];
     accent.backgroundColor = [self redColor];
-    accent.layer.cornerRadius = 2.0;
+    accent.layer.cornerRadius = 3.0;
     accent.translatesAutoresizingMaskIntoConstraints = NO;
     [hero addSubview:accent];
     [NSLayoutConstraint activateConstraints:@[
         [accent.leadingAnchor constraintEqualToAnchor:hero.leadingAnchor constant:18.0],
-        [accent.topAnchor constraintEqualToAnchor:hero.topAnchor],
-        [accent.widthAnchor constraintEqualToConstant:54.0],
-        [accent.heightAnchor constraintEqualToConstant:5.0]
+        [accent.trailingAnchor constraintEqualToAnchor:hero.trailingAnchor constant:-18.0],
+        [accent.bottomAnchor constraintEqualToAnchor:hero.bottomAnchor],
+        [accent.heightAnchor constraintEqualToConstant:6.0]
     ]];
     return hero;
 }
@@ -261,7 +381,7 @@
 
     for (UIButton *button in @[copyButton, columnsButton]) {
         button.backgroundColor = [self redColor];
-        [button setTitleColor:[self navyColor] forState:UIControlStateNormal];
+        [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         button.titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
         button.layer.cornerRadius = 10.0;
         [button.heightAnchor constraintEqualToConstant:44.0].active = YES;
@@ -322,12 +442,12 @@
     return stack;
 }
 
-- (UIStackView *)labeledControlWithTitle:(NSString *)title control:(UISegmentedControl *)control {
+- (UIStackView *)labeledViewWithTitle:(NSString *)title view:(UIView *)view {
     UILabel *label = [[UILabel alloc] init];
     label.text = title;
     label.font = [UIFont systemFontOfSize:15.0 weight:UIFontWeightSemibold];
 
-    UIStackView *stack = [[UIStackView alloc] initWithArrangedSubviews:@[label, control]];
+    UIStackView *stack = [[UIStackView alloc] initWithArrangedSubviews:@[label, view]];
     stack.axis = UILayoutConstraintAxisVertical;
     stack.spacing = 6.0;
     return stack;
@@ -405,9 +525,17 @@
 
 - (NSArray<CounterControl *> *)counterControls {
     return @[
-        self.autoFuelScored, self.autoFuelMissed, self.autoTowerLevel1,
-        self.teleopFuelScored, self.teleopFuelMissed, self.teleopFuelInactive,
-        self.fouls, self.defense
+        self.autoFuelScored, self.teleopFuelScored, self.fuelFed,
+        self.scoringEffectiveness, self.feedingPassingSkill, self.defenseSkill
+    ];
+}
+
+- (NSArray<ChoiceControl *> *)choiceControls {
+    return @[
+        self.startingPosition, self.noShow, self.autoFuelCollection, self.autoAdditionalActions,
+        self.autoStuck, self.autoClimbed, self.bumpTrench, self.defendedByOpponent,
+        self.opposingZoneActions, self.endgameClimbed, self.mechanicalIssue, self.died, self.tipped, self.scoredHow,
+        self.scoringLocation, self.passedHow, self.card, self.firstPick, self.secondPick
     ];
 }
 
@@ -435,12 +563,12 @@
 }
 
 - (void)resetTapped {
-    self.matchField.text = [self nextMatchValue];
-    self.teamField.text = @"";
-    self.robotField.text = @"";
+    self.matchNumberField.text = [self nextMatchValue];
+    self.teamNumberField.text = @"";
     self.commentsView.text = @"";
-    self.stationControl.selectedSegmentIndex = 0;
-    self.endgameControl.selectedSegmentIndex = 0;
+    for (ChoiceControl *control in [self choiceControls]) {
+        [control reset];
+    }
     for (CounterControl *control in [self counterControls]) {
         [control reset];
     }
@@ -453,7 +581,8 @@
 }
 
 - (void)copyColumnsTapped {
-    [UIPasteboard generalPasteboard].string = [[PayloadBuilder columnNames] componentsJoinedByString:@","];
+    [UIPasteboard generalPasteboard].string =
+        [[PayloadBuilder columnNames] componentsJoinedByString:[PayloadBuilder delimiter]];
     [self showMessageWithTitle:@"Copied" message:@"Column names copied to the clipboard."];
 }
 
@@ -472,34 +601,40 @@
 
 - (NSArray<NSString *> *)values {
     return @[
-        [PayloadBuilder sanitizeValue:self.scoutField.text],
-        [PayloadBuilder sanitizeValue:self.matchField.text],
-        [PayloadBuilder sanitizeValue:self.teamField.text],
-        [self selectedTitleForControl:self.allianceControl],
-        [self selectedTitleForControl:self.stationControl],
-        [PayloadBuilder sanitizeValue:self.robotField.text],
+        [PayloadBuilder sanitizeValue:self.scouterInitialsField.text],
+        [PayloadBuilder sanitizeValue:self.matchNumberField.text],
+        [PayloadBuilder sanitizeValue:self.teamNumberField.text],
+        self.startingPosition.selectedValue,
+        self.noShow.selectedValue,
         [NSString stringWithFormat:@"%ld", (long)self.autoFuelScored.value],
-        [NSString stringWithFormat:@"%ld", (long)self.autoFuelMissed.value],
-        [NSString stringWithFormat:@"%ld", (long)self.autoTowerLevel1.value],
+        self.autoFuelCollection.selectedValue,
+        self.autoAdditionalActions.selectedValue,
+        self.autoStuck.selectedValue,
+        self.autoClimbed.selectedValue,
         [NSString stringWithFormat:@"%ld", (long)self.teleopFuelScored.value],
-        [NSString stringWithFormat:@"%ld", (long)self.teleopFuelMissed.value],
-        [NSString stringWithFormat:@"%ld", (long)self.teleopFuelInactive.value],
-        [NSString stringWithFormat:@"%ld", (long)self.fouls.value],
-        [NSString stringWithFormat:@"%ld", (long)self.defense.value],
-        [self selectedTitleForControl:self.endgameControl],
+        self.bumpTrench.selectedValue,
+        self.defendedByOpponent.selectedValue,
+        [NSString stringWithFormat:@"%ld", (long)self.fuelFed.value],
+        self.opposingZoneActions.selectedValue,
+        self.endgameClimbed.selectedValue,
+        self.mechanicalIssue.selectedValue,
+        self.died.selectedValue,
+        self.tipped.selectedValue,
+        [NSString stringWithFormat:@"%ld", (long)self.scoringEffectiveness.value],
+        self.scoredHow.selectedValue,
+        self.scoringLocation.selectedValue,
+        [NSString stringWithFormat:@"%ld", (long)self.feedingPassingSkill.value],
+        self.passedHow.selectedValue,
+        [NSString stringWithFormat:@"%ld", (long)self.defenseSkill.value],
+        self.card.selectedValue,
+        self.firstPick.selectedValue,
+        self.secondPick.selectedValue,
         [PayloadBuilder sanitizeValue:self.commentsView.text]
     ];
 }
 
-- (NSString *)selectedTitleForControl:(UISegmentedControl *)control {
-    if (control.selectedSegmentIndex == UISegmentedControlNoSegment) {
-        return @"";
-    }
-    return [control titleForSegmentAtIndex:(NSUInteger)control.selectedSegmentIndex] ?: @"";
-}
-
 - (NSString *)nextMatchValue {
-    NSScanner *scanner = [NSScanner scannerWithString:self.matchField.text ?: @""];
+    NSScanner *scanner = [NSScanner scannerWithString:self.matchNumberField.text ?: @""];
     scanner.charactersToBeSkipped = nil;
     NSInteger match = 0;
     if ([scanner scanInteger:&match] && scanner.isAtEnd) {

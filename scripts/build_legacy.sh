@@ -42,6 +42,7 @@ sources=(
     AppDelegate.m
     ScoutViewController.m
     CounterControl.m
+    ChoiceControl.m
     PayloadBuilder.m
 )
 

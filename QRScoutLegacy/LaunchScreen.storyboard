@@ -16,16 +16,33 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="QRScout REBUILT" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="title-label">
-                                <rect key="frame" x="289" y="499" width="190" height="27"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
-                                <color key="textColor" white="0.12" alpha="1" colorSpace="calibratedWhite"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="MECO 8324" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="title-label">
+                                <rect key="frame" x="289" y="477" width="190" height="34"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="28"/>
+                                <color key="textColor" red="0.96" green="0.97" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="red-accent">
+                                <rect key="frame" x="304" y="523" width="160" height="5"/>
+                                <color key="backgroundColor" red="0.88" green="0.08" blue="0.12" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="5" id="accent-height"/>
+                                    <constraint firstAttribute="width" constant="160" id="accent-width"/>
+                                </constraints>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="QRSCOUT • 2026 REBUILT" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="subtitle-label">
+                                <rect key="frame" x="283" y="540" width="202" height="19"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
+                                <color key="textColor" red="0.78" green="0.84" blue="0.94" alpha="1" colorSpace="calibratedRGB"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" white="0.96" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.035" green="0.12" blue="0.28" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="title-label" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="center-x"/>
                             <constraint firstItem="title-label" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="center-y"/>
+                            <constraint firstItem="red-accent" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="accent-center-x"/>
+                            <constraint firstItem="red-accent" firstAttribute="top" secondItem="title-label" secondAttribute="bottom" constant="12" id="accent-top"/>
+                            <constraint firstItem="subtitle-label" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="subtitle-center-x"/>
+                            <constraint firstItem="subtitle-label" firstAttribute="top" secondItem="red-accent" secondAttribute="bottom" constant="10" id="subtitle-top"/>
                         </constraints>
                     </view>
                 </viewController>

@@ -2,18 +2,19 @@
 
 QRScout Legacy is a dependency-free Objective-C/UIKit scouting app for the 2026 FIRST Robotics Competition game REBUILT, presented by Haas. It runs on 64-bit iPads including the iPad mini 2 on iOS 9.3.2 and iOS 12.5.8.
 
-The original workflow is preserved:
+The legacy app mirrors the team's 2026 QRScout form:
 
-- Prematch scout, match, team, alliance, station, and robot-note entry
-- REBUILT AUTO fuel scored/missed and this robot's AUTO Level 1 tower result
-- REBUILT TELEOP active-HUB fuel scored/missed and inactive-HUB fuel tracking
-- Endgame tower Level 1, Level 2, or Level 3 selection and comments
+- Prematch scouter initials, match/team numbers, seven starting positions, and no-show status
+- AUTO fuel scored from 0–500, multi-select collection locations and other actions, A-Stop/stuck status, and climb result
+- TELEOP fuel scored and fuel fed from 0–500, Bump/Trench use, defense received, and opposing-zone actions
+- Endgame climb result plus mechanical issue, died, and tipped/fell-over status
+- Postmatch scoring, passing, and defense ratings; scoring/passing methods; scoring locations; cards; pick-list choices; and comments
 - Live ISO-8859-1 QR generation
-- CSV payload and column-name clipboard actions
+- tab-separated payload and column-name clipboard actions for direct spreadsheet scanning/pasting
 - Commit confirmation
-- Reset behavior that keeps the scout/alliance and advances a numeric match number
+- Reset behavior that keeps the scouter initials and advances a numeric match number
 
-The interface uses a REBUILT navy/red/white MECO Robotics visual system with a gradient team header, rounded scouting cards, red accent markers, polished input fields, clearer counter controls, and an app icon branded for FRC Team 8324 MECO Robotics in `QRScoutLegacy/Assets.xcassets`.
+The interface uses a navy/red/white MECO Robotics visual system with the official Team 8324 badge in a logo-style header, a matching launch screen, rounded scouting cards, red accent markers, polished input fields, clearer counter controls, and the supplied app icon in `QRScoutLegacy/Assets.xcassets`.
 
 ## Compatibility choices
 
@@ -85,17 +86,17 @@ Keep automatic date/time enabled on an older device before installing, since cer
 
 ## REBUILT scouting contract
 
-REBUILT has a 20-second AUTO period followed by 2:20 of TELEOP. FUEL scored through an active HUB and TOWER levels are the game-specific scoring observations captured here. The app records missed fuel and fuel observed in an inactive HUB as scouting data; those observations do not themselves award match points. The official game manual defines AUTO Level 1 tower scoring for up to two alliance robots, and TELEOP tower Levels 1–3; this per-robot form records whether the selected robot achieved each result.
+REBUILT has a 20-second AUTO period followed by 2:20 of TELEOP. The form uses the same compact values as the team's 2026 QRScout configuration: starting positions such as `OT` and `DBFT`, comma-joined codes for multi-select cells, `true`/`false` booleans, `C`/`F` AUTO climb results, and `L1`–`L3` endgame climb levels.
 
 ## Spreadsheet contract
 
-The QR payload remains a comma-separated row in this exact order:
+The QR payload contains exactly 29 tab-separated values in this order:
 
 ```text
-scout,match,team,alliance,station,robotNotes,autoFuelScored,autoFuelMissed,autoTowerLevel1,teleopFuelScored,teleopFuelMissed,teleopFuelInactive,fouls,defenseRating,towerLevel,comments
+Scouter Initials<TAB>Match Number<TAB>Team Number<TAB>Starting Position<TAB>No Show<TAB>Fuel Scored<TAB>Where collected Fuel<TAB>Other Auto actions<TAB>Robot Stuck or a Stop in Auto<TAB>Climbed<TAB>Fuel Scored<TAB>Bump Trench<TAB>Deffended by Opponent<TAB>Fuel Fed<TAB>Opposing Zone Actions<TAB>Climbed<TAB>Mechanical Issue<TAB>Died<TAB>Triped/Fell Over<TAB>Scoring Efectiveness<TAB>Scored How?<TAB>Scoring Location<TAB>Feeding/Passing Skill<TAB>Passed How?<TAB>Defense Skill<TAB>Yello/Red Card<TAB>First Pick<TAB>Second Pick<TAB>Comments
 ```
 
-Commas and line feeds in free text are converted to spaces, matching the original app. The payload contract is covered by both the XCTest target and the command-line test script.
+`<TAB>` above represents one literal tab character. Multi-select values use commas inside their single spreadsheet cell, for example `1,3`. Tabs and line breaks in free text are converted to spaces so they cannot shift later values into the wrong columns. The header spellings are intentionally preserved from the supplied spreadsheet contract, including `Deffended`, `Triped`, `Efectiveness`, and `Yello`. The 29-field order and invalid-field-count rejection are covered by both the XCTest target and the command-line test script.
 
 ## Verification
 

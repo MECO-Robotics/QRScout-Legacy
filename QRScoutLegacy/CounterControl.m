@@ -25,7 +25,7 @@
     self.backgroundColor = [UIColor whiteColor];
     self.layer.cornerRadius = 14.0;
     self.layer.borderWidth = 1.0;
-    self.layer.borderColor = [UIColor colorWithRed:0.86 green:0.72 blue:0.74 alpha:1.0].CGColor;
+    self.layer.borderColor = [UIColor colorWithRed:0.10 green:0.25 blue:0.48 alpha:0.42].CGColor;
     [self.heightAnchor constraintEqualToConstant:58.0].active = YES;
 
     UILabel *titleLabel = [[UILabel alloc] init];
