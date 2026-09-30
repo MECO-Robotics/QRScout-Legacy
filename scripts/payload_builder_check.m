@@ -26,12 +26,12 @@ int main(void) {
                     @"spreadsheet sanitation changed");
 
         NSArray *values = @[
-            @"AJ", @"12", @"8324", @"OT", @"false", @"500", @"1,3", @"1,2", @"true", @"C",
-            @"450", @"1,2", @"true", @"300", @"1,2", @"L3", @"true", @"false", @"true",
-            @"5", @"both", @"1,3", @"4", @"stationary", @"5", @"Yellow", @"Yes", @"May", @"solid"
+            @"AJ", @"12", @"8324", @"Outpost Trench", @"false", @"500", @"Outpost,Neutral Zone", @"Passed,Bump", @"true", @"C",
+            @"450", @"Bump,Trench", @"true", @"300", @"Collecting,Defense", @"L3", @"true", @"false", @"true",
+            @"5", @"both", @"Outpost Trench,Hub", @"4", @"stationary", @"5", @"Yellow", @"Yes", @"May", @"solid"
         ];
         AssertEqual([PayloadBuilder payloadFromValues:values],
-                    @"AJ\t12\t8324\tOT\tfalse\t500\t1,3\t1,2\ttrue\tC\t450\t1,2\ttrue\t300\t1,2\tL3\ttrue\tfalse\ttrue\t5\tboth\t1,3\t4\tstationary\t5\tYellow\tYes\tMay\tsolid",
+                    @"AJ\t12\t8324\tOutpost Trench\tfalse\t500\tOutpost,Neutral Zone\tPassed,Bump\ttrue\tC\t450\tBump,Trench\ttrue\t300\tCollecting,Defense\tL3\ttrue\tfalse\ttrue\t5\tboth\tOutpost Trench,Hub\t4\tstationary\t5\tYellow\tYes\tMay\tsolid",
                     @"payload value order changed");
         AssertEqual([PayloadBuilder payloadFromValues:@[@"too", @"short"]],
                     @"",

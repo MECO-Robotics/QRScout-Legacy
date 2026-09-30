@@ -86,7 +86,7 @@ Keep automatic date/time enabled on an older device before installing, since cer
 
 ## REBUILT scouting contract
 
-REBUILT has a 20-second AUTO period followed by 2:20 of TELEOP. The form uses the same compact values as the team's 2026 QRScout configuration: starting positions such as `OT` and `DBFT`, comma-joined codes for multi-select cells, `true`/`false` booleans, `C`/`F` AUTO climb results, and `L1`–`L3` endgame climb levels.
+REBUILT has a 20-second AUTO period followed by 2:20 of TELEOP. Starting positions, collection locations, scoring locations, and multi-select actions are written using the full names shown to the scout, such as `Outpost Trench`, `Neutral Zone`, and `Defense`. Booleans use `true`/`false`, AUTO climb results use `C`/`F`, and endgame climb levels use `L1`–`L3`.
 
 ## Spreadsheet contract
 
@@ -96,7 +96,7 @@ The QR payload contains exactly 29 tab-separated values in this order:
 Scouter Initials<TAB>Match Number<TAB>Team Number<TAB>Starting Position<TAB>No Show<TAB>Fuel Scored<TAB>Where collected Fuel<TAB>Other Auto actions<TAB>Robot Stuck or a Stop in Auto<TAB>Climbed<TAB>Fuel Scored<TAB>Bump Trench<TAB>Deffended by Opponent<TAB>Fuel Fed<TAB>Opposing Zone Actions<TAB>Climbed<TAB>Mechanical Issue<TAB>Died<TAB>Triped/Fell Over<TAB>Scoring Efectiveness<TAB>Scored How?<TAB>Scoring Location<TAB>Feeding/Passing Skill<TAB>Passed How?<TAB>Defense Skill<TAB>Yello/Red Card<TAB>First Pick<TAB>Second Pick<TAB>Comments
 ```
 
-`<TAB>` above represents one literal tab character. Multi-select values use commas inside their single spreadsheet cell, for example `1,3`. Tabs and line breaks in free text are converted to spaces so they cannot shift later values into the wrong columns. The header spellings are intentionally preserved from the supplied spreadsheet contract, including `Deffended`, `Triped`, `Efectiveness`, and `Yello`. The 29-field order and invalid-field-count rejection are covered by both the XCTest target and the command-line test script.
+`<TAB>` above represents one literal tab character. Multi-select values use commas inside their single spreadsheet cell, for example `Outpost,Neutral Zone`. Tabs and line breaks in free text are converted to spaces so they cannot shift later values into the wrong columns. The header spellings are intentionally preserved from the supplied spreadsheet contract, including `Deffended`, `Triped`, `Efectiveness`, and `Yello`. The 29-field order and invalid-field-count rejection are covered by both the XCTest target and the command-line test script.
 
 ## Verification
 

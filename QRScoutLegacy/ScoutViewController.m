@@ -73,7 +73,8 @@
     self.startingPosition = [[ChoiceControl alloc]
         initWithTitles:@[@"Outpost Trench", @"Outpost Bump — Trench", @"Outpost Bump — Hub",
                          @"Hub", @"Depot Bump — Hub", @"Depot Bump — Trench", @"Depot Trench"]
-                 values:@[@"OT", @"OBFT", @"OBFH", @"H", @"DBFH", @"DBFT", @"DT"]
+                 values:@[@"Outpost Trench", @"Outpost Bump — Trench", @"Outpost Bump — Hub",
+                          @"Hub", @"Depot Bump — Hub", @"Depot Bump — Trench", @"Depot Trench"]
         allowsMultipleSelection:NO
           defaultValues:@[]];
     self.noShow = [[ChoiceControl alloc]
@@ -82,11 +83,12 @@
     self.autoFuelCollection = [[ChoiceControl alloc]
         initWithTitles:@[@"Outpost", @"Depot", @"Neutral Zone", @"Neutral Zone — 2nd Pass",
                          @"Did Not Move", @"Moved Without Collecting"]
-                 values:@[@"1", @"2", @"3", @"4", @"5", @"6"]
+                 values:@[@"Outpost", @"Depot", @"Neutral Zone", @"Neutral Zone — 2nd Pass",
+                          @"Did Not Move", @"Moved Without Collecting"]
         allowsMultipleSelection:YES
           defaultValues:@[]];
     self.autoAdditionalActions = [[ChoiceControl alloc]
-        initWithTitles:@[@"Passed", @"Bump", @"Trench"] values:@[@"1", @"2", @"3"]
+        initWithTitles:@[@"Passed", @"Bump", @"Trench"] values:@[@"Passed", @"Bump", @"Trench"]
         allowsMultipleSelection:YES defaultValues:@[]];
     self.autoStuck = [[ChoiceControl alloc]
         initWithTitles:@[@"No", @"Yes"] values:@[@"false", @"true"]
@@ -95,13 +97,13 @@
         initWithTitles:@[@"No Climb", @"Climbed", @"Failed Climb"] values:@[@"No", @"C", @"F"]
         allowsMultipleSelection:NO defaultValues:@[@"No"]];
     self.bumpTrench = [[ChoiceControl alloc]
-        initWithTitles:@[@"Bump", @"Trench"] values:@[@"1", @"2"]
+        initWithTitles:@[@"Bump", @"Trench"] values:@[@"Bump", @"Trench"]
         allowsMultipleSelection:YES defaultValues:@[]];
     self.defendedByOpponent = [[ChoiceControl alloc]
         initWithTitles:@[@"No", @"Yes"] values:@[@"false", @"true"]
         allowsMultipleSelection:NO defaultValues:@[@"false"]];
     self.opposingZoneActions = [[ChoiceControl alloc]
-        initWithTitles:@[@"Collecting", @"Defense"] values:@[@"1", @"2"]
+        initWithTitles:@[@"Collecting", @"Defense"] values:@[@"Collecting", @"Defense"]
         allowsMultipleSelection:YES defaultValues:@[]];
     self.endgameClimbed = [[ChoiceControl alloc]
         initWithTitles:@[@"No Climb", @"Level 1", @"Level 2", @"Level 3", @"Failed Climb"]
@@ -124,7 +126,7 @@
           defaultValues:@[]];
     self.scoringLocation = [[ChoiceControl alloc]
         initWithTitles:@[@"Outpost Trench", @"Outpost", @"Hub", @"Ladder", @"Depot", @"Depot Trench"]
-                 values:@[@"1", @"2", @"3", @"4", @"5", @"6"]
+                 values:@[@"Outpost Trench", @"Outpost", @"Hub", @"Ladder", @"Depot", @"Depot Trench"]
         allowsMultipleSelection:YES
           defaultValues:@[]];
     self.passedHow = [[ChoiceControl alloc]
