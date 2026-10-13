@@ -36,4 +36,17 @@
     return [values componentsJoinedByString:[self delimiter]];
 }
 
++ (NSString *)scannerPayloadFromValues:(NSArray<NSString *> *)values {
+    NSString *payload = [self payloadFromValues:values];
+    if (payload.length == 0) {
+        return @"";
+    }
+    NSData *data = [payload dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *base64 = [data base64EncodedStringWithOptions:0];
+    base64 = [base64 stringByReplacingOccurrencesOfString:@"+" withString:@"-"];
+    base64 = [base64 stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+    base64 = [base64 stringByReplacingOccurrencesOfString:@"=" withString:@""];
+    return [@"QRSCOUT1-" stringByAppendingString:base64];
+}
+
 @end

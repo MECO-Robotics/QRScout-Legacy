@@ -646,13 +646,15 @@
 }
 
 - (void)generateQRCode {
-    NSString *payload = [PayloadBuilder payloadFromValues:[self values]];
-    self.payloadTextView.text = payload;
-    self.qrImageView.image = [self qrImageFromText:payload];
+    NSArray<NSString *> *values = [self values];
+    NSString *spreadsheetPayload = [PayloadBuilder payloadFromValues:values];
+    NSString *scannerPayload = [PayloadBuilder scannerPayloadFromValues:values];
+    self.payloadTextView.text = spreadsheetPayload;
+    self.qrImageView.image = [self qrImageFromText:scannerPayload];
 }
 
 - (UIImage *)qrImageFromText:(NSString *)text {
-    NSData *data = [text dataUsingEncoding:NSISOLatin1StringEncoding allowLossyConversion:NO];
+    NSData *data = [text dataUsingEncoding:NSUTF8StringEncoding];
     CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
     if (data == nil || filter == nil) {
         return nil;

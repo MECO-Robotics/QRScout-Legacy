@@ -9,8 +9,8 @@ The legacy app mirrors the team's 2026 QRScout form:
 - TELEOP fuel scored and fuel fed from 0–500, Bump/Trench use, defense received, and opposing-zone actions
 - Endgame climb result plus mechanical issue, died, and tipped/fell-over status
 - Postmatch scoring, passing, and defense ratings; scoring/passing methods; scoring locations; cards; pick-list choices; and comments
-- Live ISO-8859-1 QR generation
-- tab-separated payload and column-name clipboard actions for direct spreadsheet scanning/pasting
+- Live UTF-8, keyboard-safe QR generation
+- keyboard-safe QR output plus tab-separated payload and column-name clipboard actions for direct spreadsheet pasting
 - Commit confirmation
 - Reset behavior that keeps the scouter initials and advances a numeric match number
 
@@ -90,13 +90,13 @@ REBUILT has a 20-second AUTO period followed by 2:20 of TELEOP. Starting positio
 
 ## Spreadsheet contract
 
-The QR payload contains exactly 29 tab-separated values in this order:
+The spreadsheet payload contains exactly 29 tab-separated values in this order:
 
 ```text
 Scouter Initials<TAB>Match Number<TAB>Team Number<TAB>Starting Position<TAB>No Show<TAB>Fuel Scored<TAB>Where collected Fuel<TAB>Other Auto actions<TAB>Robot Stuck or a Stop in Auto<TAB>Climbed<TAB>Fuel Scored<TAB>Bump Trench<TAB>Deffended by Opponent<TAB>Fuel Fed<TAB>Opposing Zone Actions<TAB>Climbed<TAB>Mechanical Issue<TAB>Died<TAB>Triped/Fell Over<TAB>Scoring Efectiveness<TAB>Scored How?<TAB>Scoring Location<TAB>Feeding/Passing Skill<TAB>Passed How?<TAB>Defense Skill<TAB>Yello/Red Card<TAB>First Pick<TAB>Second Pick<TAB>Comments
 ```
 
-`<TAB>` above represents one literal tab character. Multi-select values use commas inside their single spreadsheet cell, for example `Outpost,Neutral Zone`. Tabs and line breaks in free text are converted to spaces so they cannot shift later values into the wrong columns. The header spellings are intentionally preserved from the supplied spreadsheet contract, including `Deffended`, `Triped`, `Efectiveness`, and `Yello`. The 29-field order and invalid-field-count rejection are covered by both the XCTest target and the command-line test script.
+`<TAB>` above represents one literal tab character. Multi-select values use commas inside their single spreadsheet cell, for example `Outpost,Neutral Zone`. Tabs and line breaks in free text are converted to spaces so they cannot shift later values into the wrong columns. The QR image wraps this payload in a UTF-8, Base64URL-encoded `QRSCOUT1-` record. That record contains no Tab or Return keys, so a keyboard-wedge scanner delivers it to FieldScout as one complete value; FieldScout decodes it back into the original 29 columns. **Copy Payload** still copies the tab-separated spreadsheet form. The header spellings are intentionally preserved from the supplied spreadsheet contract, including `Deffended`, `Triped`, `Efectiveness`, and `Yello`. The field order, scanner-safe encoding, and invalid-field-count rejection are covered by the tests.
 
 ## Verification
 

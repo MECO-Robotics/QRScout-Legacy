@@ -36,6 +36,24 @@ int main(void) {
         AssertEqual([PayloadBuilder payloadFromValues:@[@"too", @"short"]],
                     @"",
                     @"invalid field count must not create a QR payload");
+
+        NSString *scannerPayload = [PayloadBuilder scannerPayloadFromValues:values];
+        if (![scannerPayload hasPrefix:@"QRSCOUT1-"] ||
+            [scannerPayload rangeOfCharacterFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].location != NSNotFound) {
+            NSLog(@"FAIL: scanner payload is not keyboard safe: %@", scannerPayload);
+            return 1;
+        }
+        NSString *base64URL = [scannerPayload substringFromIndex:@"QRSCOUT1-".length];
+        NSString *base64 = [base64URL stringByReplacingOccurrencesOfString:@"-" withString:@"+"];
+        base64 = [base64 stringByReplacingOccurrencesOfString:@"_" withString:@"/"];
+        while (base64.length % 4 != 0) {
+            base64 = [base64 stringByAppendingString:@"="];
+        }
+        NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:base64 options:0];
+        NSString *decoded = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
+        AssertEqual(decoded,
+                    [PayloadBuilder payloadFromValues:values],
+                    @"scanner payload no longer decodes to the spreadsheet payload");
     }
     return 0;
 }

@@ -37,4 +37,24 @@
     XCTAssertEqualObjects([PayloadBuilder payloadFromValues:@[@"too", @"short"]], @"");
 }
 
+- (void)testScannerPayloadIsKeyboardSafeAndRoundTripsUnicode {
+    NSMutableArray *values = [NSMutableArray arrayWithCapacity:29];
+    for (NSUInteger index = 0; index < 29; index++) {
+        [values addObject:[NSString stringWithFormat:@"field %lu — value", (unsigned long)index]];
+    }
+    NSString *payload = [PayloadBuilder scannerPayloadFromValues:values];
+    XCTAssertTrue([payload hasPrefix:@"QRSCOUT1-"]);
+    XCTAssertEqual([payload rangeOfCharacterFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].location, NSNotFound);
+
+    NSString *base64URL = [payload substringFromIndex:@"QRSCOUT1-".length];
+    NSString *base64 = [base64URL stringByReplacingOccurrencesOfString:@"-" withString:@"+"];
+    base64 = [base64 stringByReplacingOccurrencesOfString:@"_" withString:@"/"];
+    while (base64.length % 4 != 0) {
+        base64 = [base64 stringByAppendingString:@"="];
+    }
+    NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:base64 options:0];
+    NSString *decoded = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
+    XCTAssertEqualObjects(decoded, [PayloadBuilder payloadFromValues:values]);
+}
+
 @end
