@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#include <string.h>
 #import "PayloadBuilder.h"
 
 static void AssertEqual(NSString *actual, NSString *expected, NSString *message) {
@@ -8,7 +9,7 @@ static void AssertEqual(NSString *actual, NSString *expected, NSString *message)
     }
 }
 
-int main(void) {
+int main(int argc, const char * argv[]) {
     @autoreleasepool {
         NSString *columns = [[PayloadBuilder columnNames] componentsJoinedByString:[PayloadBuilder delimiter]];
         AssertEqual(columns,
@@ -38,22 +39,34 @@ int main(void) {
                     @"invalid field count must not create a QR payload");
 
         NSString *scannerPayload = [PayloadBuilder scannerPayloadFromValues:values];
-        if (![scannerPayload hasPrefix:@"QRSCOUT1-"] ||
+        if (![scannerPayload hasPrefix:@"QRSCOUT2-"] ||
             [scannerPayload rangeOfCharacterFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].location != NSNotFound) {
             NSLog(@"FAIL: scanner payload is not keyboard safe: %@", scannerPayload);
             return 1;
         }
-        NSString *base64URL = [scannerPayload substringFromIndex:@"QRSCOUT1-".length];
+        NSString *base64URL = [scannerPayload substringFromIndex:@"QRSCOUT2-".length];
         NSString *base64 = [base64URL stringByReplacingOccurrencesOfString:@"-" withString:@"+"];
         base64 = [base64 stringByReplacingOccurrencesOfString:@"_" withString:@"/"];
         while (base64.length % 4 != 0) {
             base64 = [base64 stringByAppendingString:@"="];
         }
         NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:base64 options:0];
-        NSString *decoded = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
-        AssertEqual(decoded,
-                    [PayloadBuilder payloadFromValues:values],
-                    @"scanner payload no longer decodes to the spreadsheet payload");
+        NSDictionary *decoded = [NSJSONSerialization JSONObjectWithData:decodedData options:0 error:nil];
+        if (![decoded[@"v"] isEqual:@2] || ![decoded[@"fields"] isKindOfClass:[NSDictionary class]]) {
+            NSLog(@"FAIL: scanner payload did not decode to a version 2 named-field record");
+            return 1;
+        }
+        NSDictionary *fields = decoded[@"fields"];
+        if (fields.count != 29) {
+            NSLog(@"FAIL: scanner payload field count changed: %lu", (unsigned long)fields.count);
+            return 1;
+        }
+        [[PayloadBuilder fieldIdentifiers] enumerateObjectsUsingBlock:^(NSString *identifier, NSUInteger index, BOOL *stop) {
+            AssertEqual(fields[identifier], values[index], [NSString stringWithFormat:@"field %@ shifted", identifier]);
+        }];
+        if (argc == 2 && strcmp(argv[1], "--emit-scanner-payload") == 0) {
+            printf("%s\n", scannerPayload.UTF8String);
+        }
     }
     return 0;
 }

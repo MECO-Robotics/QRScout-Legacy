@@ -17,6 +17,7 @@
         @"Defense Skill", @"Yello/Red Card", @"First Pick", @"Second Pick", @"Comments"
     ];
     XCTAssertEqual([PayloadBuilder columnNames].count, (NSUInteger)29);
+    XCTAssertEqual([PayloadBuilder fieldIdentifiers].count, (NSUInteger)29);
     XCTAssertEqualObjects([PayloadBuilder columnNames], expectedColumns);
     XCTAssertEqualObjects([PayloadBuilder delimiter], @"\t");
 }
@@ -43,18 +44,23 @@
         [values addObject:[NSString stringWithFormat:@"field %lu — value", (unsigned long)index]];
     }
     NSString *payload = [PayloadBuilder scannerPayloadFromValues:values];
-    XCTAssertTrue([payload hasPrefix:@"QRSCOUT1-"]);
+    XCTAssertTrue([payload hasPrefix:@"QRSCOUT2-"]);
     XCTAssertEqual([payload rangeOfCharacterFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].location, NSNotFound);
 
-    NSString *base64URL = [payload substringFromIndex:@"QRSCOUT1-".length];
+    NSString *base64URL = [payload substringFromIndex:@"QRSCOUT2-".length];
     NSString *base64 = [base64URL stringByReplacingOccurrencesOfString:@"-" withString:@"+"];
     base64 = [base64 stringByReplacingOccurrencesOfString:@"_" withString:@"/"];
     while (base64.length % 4 != 0) {
         base64 = [base64 stringByAppendingString:@"="];
     }
     NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:base64 options:0];
-    NSString *decoded = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
-    XCTAssertEqualObjects(decoded, [PayloadBuilder payloadFromValues:values]);
+    NSDictionary *decoded = [NSJSONSerialization JSONObjectWithData:decodedData options:0 error:nil];
+    XCTAssertEqualObjects(decoded[@"v"], @2);
+    NSDictionary *fields = decoded[@"fields"];
+    XCTAssertEqual(fields.count, (NSUInteger)29);
+    [[PayloadBuilder fieldIdentifiers] enumerateObjectsUsingBlock:^(NSString *identifier, NSUInteger index, BOOL *stop) {
+        XCTAssertEqualObjects(fields[identifier], values[index]);
+    }];
 }
 
 @end

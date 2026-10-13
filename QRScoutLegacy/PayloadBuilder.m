@@ -14,6 +14,14 @@
     ];
 }
 
++ (NSArray<NSString *> *)fieldIdentifiers {
+    return @[
+        @"si", @"mn", @"tn", @"sp", @"ns", @"afs", @"afc", @"aaa", @"ast", @"acl",
+        @"tfs", @"bt", @"dbo", @"ff", @"oza", @"ecl", @"mi", @"di", @"ti", @"se",
+        @"sh", @"sl", @"fps", @"ph", @"ds", @"ca", @"fp", @"s2p", @"co"
+    ];
+}
+
 + (NSString *)delimiter {
     return @"\t";
 }
@@ -37,16 +45,25 @@
 }
 
 + (NSString *)scannerPayloadFromValues:(NSArray<NSString *> *)values {
-    NSString *payload = [self payloadFromValues:values];
-    if (payload.length == 0) {
+    if (values.count != [self fieldIdentifiers].count) {
         return @"";
     }
-    NSData *data = [payload dataUsingEncoding:NSUTF8StringEncoding];
+
+    NSMutableDictionary<NSString *, NSString *> *fields = [NSMutableDictionary dictionary];
+    [[self fieldIdentifiers] enumerateObjectsUsingBlock:^(NSString *identifier, NSUInteger index, BOOL *stop) {
+        (void)stop;
+        fields[identifier] = [self sanitizeValue:values[index]];
+    }];
+    NSDictionary *envelope = @{ @"v": @2, @"fields": fields };
+    NSData *data = [NSJSONSerialization dataWithJSONObject:envelope options:0 error:nil];
+    if (data == nil) {
+        return @"";
+    }
     NSString *base64 = [data base64EncodedStringWithOptions:0];
     base64 = [base64 stringByReplacingOccurrencesOfString:@"+" withString:@"-"];
     base64 = [base64 stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     base64 = [base64 stringByReplacingOccurrencesOfString:@"=" withString:@""];
-    return [@"QRSCOUT1-" stringByAppendingString:base64];
+    return [@"QRSCOUT2-" stringByAppendingString:base64];
 }
 
 @end

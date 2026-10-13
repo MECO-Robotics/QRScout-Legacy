@@ -15,5 +15,9 @@ xcrun --sdk macosx clang \
     "$repository_root/QRScoutLegacy/PayloadBuilder.m" \
     -o "$temporary_directory/payload_builder_check"
 
-"$temporary_directory/payload_builder_check"
-echo "Payload contract checks passed."
+if [[ "${1:-}" == "--emit-scanner-payload" ]]; then
+    "$temporary_directory/payload_builder_check" --emit-scanner-payload
+else
+    "$temporary_directory/payload_builder_check"
+    echo "Payload contract checks passed."
+fi
