@@ -9,6 +9,15 @@ static void AssertEqual(NSString *actual, NSString *expected, NSString *message)
     }
 }
 
+static NSData *DecodeBase64URL(NSString *encoded) {
+    NSString *base64 = [encoded stringByReplacingOccurrencesOfString:@"-" withString:@"+"];
+    base64 = [base64 stringByReplacingOccurrencesOfString:@"_" withString:@"/"];
+    while (base64.length % 4 != 0) {
+        base64 = [base64 stringByAppendingString:@"="];
+    }
+    return [[NSData alloc] initWithBase64EncodedString:base64 options:0];
+}
+
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         NSString *columns = [[PayloadBuilder columnNames] componentsJoinedByString:[PayloadBuilder delimiter]];
@@ -39,31 +48,36 @@ int main(int argc, const char * argv[]) {
                     @"invalid field count must not create a QR payload");
 
         NSString *scannerPayload = [PayloadBuilder scannerPayloadFromValues:values];
-        if (![scannerPayload hasPrefix:@"QRSCOUT2-"] ||
+        if (![scannerPayload hasPrefix:@"QRSCOUT3-"] ||
             [scannerPayload rangeOfCharacterFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].location != NSNotFound) {
             NSLog(@"FAIL: scanner payload is not keyboard safe: %@", scannerPayload);
             return 1;
         }
-        NSString *base64URL = [scannerPayload substringFromIndex:@"QRSCOUT2-".length];
-        NSString *base64 = [base64URL stringByReplacingOccurrencesOfString:@"-" withString:@"+"];
-        base64 = [base64 stringByReplacingOccurrencesOfString:@"_" withString:@"/"];
-        while (base64.length % 4 != 0) {
-            base64 = [base64 stringByAppendingString:@"="];
-        }
-        NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:base64 options:0];
-        NSDictionary *decoded = [NSJSONSerialization JSONObjectWithData:decodedData options:0 error:nil];
-        if (![decoded[@"v"] isEqual:@2] || ![decoded[@"fields"] isKindOfClass:[NSDictionary class]]) {
-            NSLog(@"FAIL: scanner payload did not decode to a version 2 named-field record");
+        if (scannerPayload.length > [PayloadBuilder scannerPayloadLimit]) {
+            NSLog(@"FAIL: scanner payload is longer than the scanner's %lu-character limit: %lu",
+                  (unsigned long)[PayloadBuilder scannerPayloadLimit], (unsigned long)scannerPayload.length);
             return 1;
         }
-        NSDictionary *fields = decoded[@"fields"];
-        if (fields.count != 29) {
-            NSLog(@"FAIL: scanner payload field count changed: %lu", (unsigned long)fields.count);
+        NSString *base64URL = [scannerPayload substringFromIndex:@"QRSCOUT3-".length];
+        NSArray *decoded = [NSJSONSerialization JSONObjectWithData:DecodeBase64URL(base64URL) options:0 error:nil];
+        NSArray *expectedCodes = @[
+            @"AJ", @12, @8324, @0, @0, @500, @5, @3, @1, @1,
+            @450, @3, @1, @300, @3, @3, @1, @0, @1, @5,
+            @2, @5, @4, @1, @5, @1, @0, @1, @"solid"
+        ];
+        if (![decoded isKindOfClass:[NSArray class]] || ![decoded isEqualToArray:expectedCodes]) {
+            NSLog(@"FAIL: compact scanner payload changed\nExpected: %@\nActual: %@", expectedCodes, decoded);
             return 1;
         }
-        [[PayloadBuilder fieldIdentifiers] enumerateObjectsUsingBlock:^(NSString *identifier, NSUInteger index, BOOL *stop) {
-            AssertEqual(fields[identifier], values[index], [NSString stringWithFormat:@"field %@ shifted", identifier]);
-        }];
+
+        NSMutableArray *tooLong = [values mutableCopy];
+        tooLong[28] = [@"x" stringByPaddingToLength:300 withString:@"x" startingAtIndex:0];
+        AssertEqual([PayloadBuilder scannerPayloadFromValues:tooLong], @"",
+                    @"payloads that the S-1103T would truncate must be rejected");
+        if ([PayloadBuilder scannerPayloadFromValues:@[@"too", @"short"]].length != 0) {
+            NSLog(@"FAIL: invalid scanner field count must be rejected");
+            return 1;
+        }
         if (argc == 2 && strcmp(argv[1], "--emit-scanner-payload") == 0) {
             printf("%s\n", scannerPayload.UTF8String);
         }

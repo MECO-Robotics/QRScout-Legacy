@@ -11,6 +11,8 @@
 @property (strong, nonatomic) UIStackView *contentStack;
 @property (strong, nonatomic) UIImageView *qrImageView;
 @property (strong, nonatomic) UITextView *payloadTextView;
+@property (strong, nonatomic) UILabel *qrStatusLabel;
+@property (nonatomic) BOOL qrPayloadFitsScanner;
 
 @property (strong, nonatomic) UITextField *scouterInitialsField;
 @property (strong, nonatomic) UITextField *matchNumberField;
@@ -64,6 +66,7 @@
     self.contentStack = [[UIStackView alloc] init];
     self.qrImageView = [[UIImageView alloc] init];
     self.payloadTextView = [[UITextView alloc] init];
+    self.qrStatusLabel = [[UILabel alloc] init];
 
     self.scouterInitialsField = [self textFieldWithPlaceholder:@"Initials"];
     self.matchNumberField = [self textFieldWithPlaceholder:@"Match"];
@@ -365,6 +368,10 @@
     self.qrImageView.accessibilityLabel = @"Scouting QR code";
     [self.qrImageView.heightAnchor constraintEqualToConstant:240.0].active = YES;
 
+    self.qrStatusLabel.font = [UIFont systemFontOfSize:13.0 weight:UIFontWeightSemibold];
+    self.qrStatusLabel.textAlignment = NSTextAlignmentCenter;
+    self.qrStatusLabel.numberOfLines = 0;
+
     self.payloadTextView.editable = NO;
     self.payloadTextView.font = [UIFont monospacedDigitSystemFontOfSize:14.0 weight:UIFontWeightRegular];
     self.payloadTextView.backgroundColor = [UIColor colorWithWhite:0.98 alpha:1.0];
@@ -390,7 +397,7 @@
     }
 
     [self.contentStack addArrangedSubview:[self sectionWithTitle:@"QR Output" views:@[
-        self.qrImageView, self.payloadTextView, [self rowWithViews:@[copyButton, columnsButton]]
+        self.qrImageView, self.qrStatusLabel, self.payloadTextView, [self rowWithViews:@[copyButton, columnsButton]]
     ]]];
 }
 
@@ -544,8 +551,13 @@
 - (void)commitTapped {
     [self.view endEditing:YES];
     [self generateQRCode];
+    if (!self.qrPayloadFitsScanner) {
+        [self showMessageWithTitle:@"QR Code Too Large"
+                           message:@"Shorten Scouter Initials or Comments. QRScout will not show a barcode that the S-1103T scanner would cut off."];
+        return;
+    }
     [self showMessageWithTitle:@"QR Code Ready"
-                       message:@"The scouting payload has been encoded."];
+                       message:@"The complete scouting entry fits the scanner and is ready to scan."];
 }
 
 - (void)updateTapped {
@@ -650,7 +662,14 @@
     NSString *spreadsheetPayload = [PayloadBuilder payloadFromValues:values];
     NSString *scannerPayload = [PayloadBuilder scannerPayloadFromValues:values];
     self.payloadTextView.text = spreadsheetPayload;
-    self.qrImageView.image = [self qrImageFromText:scannerPayload];
+    self.qrPayloadFitsScanner = scannerPayload.length > 0;
+    self.qrImageView.image = self.qrPayloadFitsScanner ? [self qrImageFromText:scannerPayload] : nil;
+    self.qrStatusLabel.text = self.qrPayloadFitsScanner
+        ? [NSString stringWithFormat:@"Scanner-safe • %lu / %lu characters",
+            (unsigned long)scannerPayload.length, (unsigned long)[PayloadBuilder scannerPayloadLimit]]
+        : [NSString stringWithFormat:@"Too large for scanner • shorten Initials or Comments (maximum %lu characters)",
+            (unsigned long)[PayloadBuilder scannerPayloadLimit]];
+    self.qrStatusLabel.textColor = self.qrPayloadFitsScanner ? [self navyColor] : [self redColor];
 }
 
 - (UIImage *)qrImageFromText:(NSString *)text {
